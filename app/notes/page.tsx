@@ -1,20 +1,13 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import styles from './page.module.css'
-
-interface Note {
-  _id: string
-  title: string
-  content: string
-  createdAt: string
-  updatedAt: string
-}
+import { supabase } from '@/utils/supabase' // Add this
+// Remove next-auth import
+// import { useSession } from 'next-auth/react'
 
 export default function NotesPage() {
-  const { status } = useSession()
   const router = useRouter()
   const [notes, setNotes] = useState<Note[]>([])
   const [newNote, setNewNote] = useState({ title: '', content: '' })
@@ -23,12 +16,16 @@ export default function NotesPage() {
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    if (status === 'unauthenticated') {
-      router.push('/login')
-    } else if (status === 'authenticated') {
-      fetchNotes()
+    const checkUser = async () => {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session) {
+        router.push('/login')
+      } else {
+        fetchNotes()
+      }
     }
-  }, [status, router])
+    checkUser()
+  }, [])
 
   const fetchNotes = async () => {
     try {

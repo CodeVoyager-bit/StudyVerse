@@ -9,6 +9,7 @@ const nextConfig: NextConfig = {
   images: {
     domains: ['your-supabase-project-id.supabase.co'],
   },
+  output: 'standalone',
 };
 
 export default nextConfig;
