@@ -17,7 +17,7 @@ export default function LoginPage() {
     setError('')
 
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
+      const { error } = await supabase.auth.signInWithPassword({
         email,
         password,
       })
@@ -25,10 +25,10 @@ export default function LoginPage() {
       if (error) {
         setError(error.message)
       } else {
-        router.push('/') // Changed from '/dashboard' to '/' for home page
+        router.push('/')
       }
     } catch (error) {
-      setError('An error occurred during login')
+      setError(`An error occurred during login ${error}`)
     }
   }
 
@@ -65,7 +65,7 @@ export default function LoginPage() {
           </button>
         </form>
         <p className={styles.registerLink}>
-          Don't have an account? <Link href="/register">Register here</Link>
+          {"Don't have an account?"} <Link href="/register">Register here</Link>
         </p>
       </div>
     </div>

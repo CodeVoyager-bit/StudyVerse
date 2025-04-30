@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-// import { useSession } from 'next-auth/react'
+import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import styles from './page.module.css'
 
@@ -14,12 +14,11 @@ interface Task {
 }
 
 export default function TasksPage() {
-  // const { data: session, status } = useSession()
+  const { status } = useSession()
   const router = useRouter()
   const [tasks, setTasks] = useState<Task[]>([])
   const [newTask, setNewTask] = useState({ title: '', description: '', dueDate: '' })
   const [loading, setLoading] = useState(true)
-let status='authenticated'
   useEffect(() => {
     if (status === 'unauthenticated') {
       router.push('/login')
@@ -159,4 +158,4 @@ let status='authenticated'
       </div>
     </div>
   )
-} 
+}

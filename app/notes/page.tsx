@@ -14,7 +14,7 @@ interface Note {
 }
 
 export default function NotesPage() {
-  const { data: session, status } = useSession()
+  const { status } = useSession()
   const router = useRouter()
   const [notes, setNotes] = useState<Note[]>([])
   const [newNote, setNewNote] = useState({ title: '', content: '' })
@@ -118,7 +118,7 @@ export default function NotesPage() {
     }
   }
 
-  if (status === 'loading') {
+  if (status === 'loading' || loading) {
     return <div className={styles.loading}>Loading...</div>
   }
 
