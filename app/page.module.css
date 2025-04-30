@@ -1,0 +1,68 @@
+.home {
+  min-height: 100vh;
+}
+
+.hero {
+  text-align: center;
+  padding: 4rem 0;
+  background: linear-gradient(135deg, var(--primary-color) 0%, #4338CA 100%);
+  color: white;
+  margin-bottom: 4rem;
+}
+
+.hero h1 {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.hero p {
+  font-size: 1.25rem;
+  margin-bottom: 2rem;
+  opacity: 0.9;
+}
+
+.ctaButtons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.features {
+  padding: 2rem 0;
+}
+
+.features h2 {
+  text-align: center;
+  font-size: 2rem;
+  margin-bottom: 2rem;
+}
+
+.featureGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  padding: 0 1rem;
+}
+
+.card {
+  background: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.card h3 {
+  color: var(--primary-color);
+  margin-bottom: 1rem;
+}
+
+.card p {
+  color: var(--text-color);
+  opacity: 0.8;
+} 
