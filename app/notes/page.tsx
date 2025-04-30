@@ -20,6 +20,7 @@ export default function NotesPage() {
   const [newNote, setNewNote] = useState({ title: '', content: '' })
   const [editingNote, setEditingNote] = useState<Note | null>(null)
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -27,14 +28,19 @@ export default function NotesPage() {
     } else if (status === 'authenticated') {
       fetchNotes()
     }
-  }, [status])
+  }, [status, router])
 
   const fetchNotes = async () => {
     try {
+      setError(null)
       const response = await fetch('/api/notes')
+      if (!response.ok) {
+        throw new Error('Failed to fetch notes')
+      }
       const data = await response.json()
       setNotes(data)
     } catch (error) {
+      setError('Error fetching notes. Please try again later.')
       console.error('Error fetching notes:', error)
     } finally {
       setLoading(false)
@@ -44,6 +50,7 @@ export default function NotesPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     try {
+      setError(null)
       const response = await fetch('/api/notes', {
         method: 'POST',
         headers: {
@@ -52,11 +59,14 @@ export default function NotesPage() {
         body: JSON.stringify(newNote),
       })
 
-      if (response.ok) {
-        setNewNote({ title: '', content: '' })
-        fetchNotes()
+      if (!response.ok) {
+        throw new Error('Failed to create note')
       }
+
+      setNewNote({ title: '', content: '' })
+      await fetchNotes()
     } catch (error) {
+      setError('Error creating note. Please try again later.')
       console.error('Error creating note:', error)
     }
   }
@@ -66,6 +76,7 @@ export default function NotesPage() {
     if (!editingNote) return
 
     try {
+      setError(null)
       const response = await fetch(`/api/notes/${editingNote._id}`, {
         method: 'PATCH',
         headers: {
@@ -77,31 +88,42 @@ export default function NotesPage() {
         }),
       })
 
-      if (response.ok) {
-        setEditingNote(null)
-        fetchNotes()
+      if (!response.ok) {
+        throw new Error('Failed to update note')
       }
+
+      setEditingNote(null)
+      await fetchNotes()
     } catch (error) {
+      setError('Error updating note. Please try again later.')
       console.error('Error updating note:', error)
     }
   }
 
   const deleteNote = async (noteId: string) => {
     try {
+      setError(null)
       const response = await fetch(`/api/notes/${noteId}`, {
         method: 'DELETE',
       })
 
-      if (response.ok) {
-        fetchNotes()
+      if (!response.ok) {
+        throw new Error('Failed to delete note')
       }
+
+      await fetchNotes()
     } catch (error) {
+      setError('Error deleting note. Please try again later.')
       console.error('Error deleting note:', error)
     }
   }
 
-  if (loading) {
+  if (status === 'loading') {
     return <div className={styles.loading}>Loading...</div>
+  }
+
+  if (error) {
+    return <div className={styles.error}>{error}</div>
   }
 
   return (
@@ -198,4 +220,4 @@ export default function NotesPage() {
       </div>
     </div>
   )
-} 
+}

@@ -25,7 +25,7 @@ export default function LoginPage() {
       if (error) {
         setError(error.message)
       } else {
-        router.push('/dashboard') // Changed from '../page.txt' to '/dashboard'
+        router.push('/') // Changed from '/dashboard' to '/' for home page
       }
     } catch (error) {
       setError('An error occurred during login')

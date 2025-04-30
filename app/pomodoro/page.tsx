@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef } from 'react'
-import styles from './page.module.css'
+import styles from '../page.module.css'
 
 const WORK_DURATION = 25 * 60 // 25 minutes in seconds
 const BREAK_DURATION = 5 * 60 // 5 minutes in seconds
