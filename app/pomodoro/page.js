@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef } from 'react'
-import styles from '../page.module.css'
+import styles from './page.module.css'  // Update this line
 
 const WORK_DURATION = 25 * 60 // 25 minutes in seconds
 const BREAK_DURATION = 5 * 60 // 5 minutes in seconds
@@ -11,9 +11,9 @@ export default function PomodoroPage() {
   const [isWork, setIsWork] = useState(true)
   const [secondsLeft, setSecondsLeft] = useState(WORK_DURATION)
   const [cycles, setCycles] = useState(0)
-  const intervalRef = useRef<NodeJS.Timeout | null>(null)
+  const intervalRef = useRef(null)
 
-  const formatTime = (secs: number) => {
+  const formatTime = (secs) => {
     const m = Math.floor(secs / 60).toString().padStart(2, '0')
     const s = (secs % 60).toString().padStart(2, '0')
     return `${m}:${s}`
@@ -25,7 +25,7 @@ export default function PomodoroPage() {
     intervalRef.current = setInterval(() => {
       setSecondsLeft(prev => {
         if (prev === 1) {
-          clearInterval(intervalRef.current!)
+          clearInterval(intervalRef.current)
           setIsRunning(false)
           if (isWork) {
             setIsWork(false)

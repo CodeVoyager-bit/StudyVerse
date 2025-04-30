@@ -1,37 +1,40 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import styles from './page.module.css'
-
-interface Task {
-  _id: string
-  title: string
-  description: string
-  dueDate: string
-  completed: boolean
-}
+import { supabase } from '@/utils/supabase'
 
 export default function TasksPage() {
-  const { status } = useSession()
   const router = useRouter()
-  const [tasks, setTasks] = useState<Task[]>([])
+  const [tasks, setTasks] = useState([])
   const [newTask, setNewTask] = useState({ title: '', description: '', dueDate: '' })
   const [loading, setLoading] = useState(true)
+
   useEffect(() => {
-    if (status === 'unauthenticated') {
+    checkUser()
+  }, [])
+
+  const checkUser = async () => {
+    const { data: { session } } = await supabase.auth.getSession()
+    if (!session) {
       router.push('/login')
-    } else if (status === 'authenticated') {
+    } else {
       fetchTasks()
     }
-  }, [status])
+  }
 
   const fetchTasks = async () => {
     try {
-      const response = await fetch('/api/tasks')
-      const data = await response.json()
-      setTasks(data)
+      const { data: { session } } = await supabase.auth.getSession()
+      const { data, error } = await supabase
+        .from('tasks')
+        .select('*')
+        .eq('user_id', session.user.id)
+        .order('created_at', { ascending: false })
+
+      if (error) throw error
+      setTasks(data || [])
     } catch (error) {
       console.error('Error fetching tasks:', error)
     } finally {
@@ -39,49 +42,52 @@ export default function TasksPage() {
     }
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     try {
-      const response = await fetch('/api/tasks', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(newTask),
-      })
+      const { data: { session } } = await supabase.auth.getSession()
+      const { error } = await supabase
+        .from('tasks')
+        .insert({
+          title: newTask.title,
+          description: newTask.description,
+          due_date: newTask.dueDate,
+          user_id: session.user.id,
+          completed: false
+        })
 
-      if (response.ok) {
-        setNewTask({ title: '', description: '', dueDate: '' })
-        fetchTasks()
-      }
+      if (error) throw error
+      setNewTask({ title: '', description: '', dueDate: '' })
+      fetchTasks()
     } catch (error) {
       console.error('Error creating task:', error)
     }
   }
 
-  const toggleTask = async (taskId: string) => {
+  const toggleTask = async (taskId) => {
     try {
-      const response = await fetch(`/api/tasks/${taskId}`, {
-        method: 'PATCH',
-      })
+      const task = tasks.find(t => t.id === taskId)
+      const { error } = await supabase
+        .from('tasks')
+        .update({ completed: !task.completed })
+        .eq('id', taskId)
 
-      if (response.ok) {
-        fetchTasks()
-      }
+      if (error) throw error
+      fetchTasks()
     } catch (error) {
       console.error('Error updating task:', error)
     }
   }
 
-  const deleteTask = async (taskId: string) => {
+  const deleteTask = async (taskId) => {
     try {
-      const response = await fetch(`/api/tasks/${taskId}`, {
-        method: 'DELETE',
-      })
+      const { error } = await supabase
+        .from('tasks')
+        .delete()
+        .eq('id', taskId)
 
-      if (response.ok) {
-        fetchTasks()
-      }
+      if (error) throw error
+      fetchTasks()
     } catch (error) {
       console.error('Error deleting task:', error)
     }
@@ -129,25 +135,25 @@ export default function TasksPage() {
 
       <div className={styles.taskList}>
         {tasks.map((task) => (
-          <div key={task._id} className={`${styles.taskCard} ${task.completed ? styles.completed : ''}`}>
+          <div key={task.id} className={`${styles.taskCard} ${task.completed ? styles.completed : ''}`}>
             <div className={styles.taskContent}>
               <h3>{task.title}</h3>
               <p>{task.description}</p>
-              {task.dueDate && (
+              {task.due_date && (
                 <p className={styles.dueDate}>
-                  Due: {new Date(task.dueDate).toLocaleString()}
+                  Due: {new Date(task.due_date).toLocaleString()}
                 </p>
               )}
             </div>
             <div className={styles.taskActions}>
               <button
-                onClick={() => toggleTask(task._id)}
+                onClick={() => toggleTask(task.id)}
                 className={`btn ${task.completed ? 'btn-secondary' : 'btn-primary'}`}
               >
                 {task.completed ? 'Mark Incomplete' : 'Mark Complete'}
               </button>
               <button
-                onClick={() => deleteTask(task._id)}
+                onClick={() => deleteTask(task.id)}
                 className="btn btn-secondary"
               >
                 Delete

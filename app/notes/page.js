@@ -7,14 +7,17 @@ import { supabase } from '@/utils/supabase' // Add this
 // Remove next-auth import
 // import { useSession } from 'next-auth/react'
 
+
+
 export default function NotesPage() {
   const router = useRouter()
-  const [notes, setNotes] = useState<Note[]>([])
+  const [notes, setNotes] = useState([])
   const [newNote, setNewNote] = useState({ title: '', content: '' })
   const [editingNote, setEditingNote] = useState<Note | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
+  // Update useEffect to include router in dependencies
   useEffect(() => {
     const checkUser = async () => {
       const { data: { session } } = await supabase.auth.getSession()
@@ -25,56 +28,45 @@ export default function NotesPage() {
       }
     }
     checkUser()
-  }, [])
-
-  const fetchNotes = async () => {
-    try {
-      setError(null)
-      const response = await fetch('/api/notes')
-      if (!response.ok) {
-        throw new Error('Failed to fetch notes')
-      }
-      const data = await response.json()
-      setNotes(data)
-    } catch (error) {
-      setError('Error fetching notes. Please try again later.')
-      console.error('Error fetching notes:', error)
-    } finally {
-      setLoading(false)
+  }, [router]) // Added router to dependency array
+  const handleSubmit = async (e) => {
+  e.preventDefault()
+  try {
+    setError(null)
+    const { data: { session } } = await supabase.auth.getSession()
+    
+    if (!session) {
+      router.push('/login')
+      return
     }
-  }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    try {
-      setError(null)
-      const response = await fetch('/api/notes', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(newNote),
+    const { error } = await supabase
+      .from('notes')
+      .insert({
+        title: newNote.title,
+        content: newNote.content,
+        user_id: session.user.id
       })
+      .select()
 
-      if (!response.ok) {
-        throw new Error('Failed to create note')
-      }
+    if (error) throw error
 
-      setNewNote({ title: '', content: '' })
-      await fetchNotes()
-    } catch (error) {
-      setError('Error creating note. Please try again later.')
-      console.error('Error creating note:', error)
-    }
+    setNewNote({ title: '', content: '' })
+    await fetchNotes()
+  } catch (error) {
+    setError('Error creating note. Please try again later.')
+    console.error('Error creating note:', error.message)
   }
+}
 
-  const handleUpdate = async (e: React.FormEvent) => {
+  // Update handleUpdate function to use 'id' instead of '_id'
+  const handleUpdate = async (e) => {
     e.preventDefault()
     if (!editingNote) return
-
+  
     try {
       setError(null)
-      const response = await fetch(`/api/notes/${editingNote._id}`, {
+      const response = await fetch(`/api/notes/${editingNote.id}`, { // Changed from _id to id
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -84,11 +76,11 @@ export default function NotesPage() {
           content: editingNote.content,
         }),
       })
-
+  
       if (!response.ok) {
         throw new Error('Failed to update note')
       }
-
+  
       setEditingNote(null)
       await fetchNotes()
     } catch (error) {
@@ -97,7 +89,7 @@ export default function NotesPage() {
     }
   }
 
-  const deleteNote = async (noteId: string) => {
+  const deleteNote = async (noteId) => {
     try {
       setError(null)
       const response = await fetch(`/api/notes/${noteId}`, {
@@ -112,6 +104,31 @@ export default function NotesPage() {
     } catch (error) {
       setError('Error deleting note. Please try again later.')
       console.error('Error deleting note:', error)
+    }
+  }
+
+  const fetchNotes = async () => {
+    try {
+      setError(null)
+      const { data: { session } } = await supabase.auth.getSession()
+      
+      if (!session) {
+        throw new Error('No authenticated session')
+      }
+  
+      const { data, error } = await supabase
+        .from('notes')
+        .select('*')
+        .eq('user_id', session.user.id)
+        .order('created_at', { ascending: false })
+  
+      if (error) throw error
+      setNotes(data || [])
+    } catch (error) {
+      setError('Error fetching notes. Please try again later.')
+      console.error('Error fetching notes:', error)
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -188,14 +205,15 @@ export default function NotesPage() {
         </form>
       )}
 
+   
       <div className={styles.notesList}>
         {notes.map((note) => (
-          <div key={note._id} className={styles.noteCard}>
+          <div key={note.id} className={styles.noteCard}> {/* Changed from _id to id */}
             <div className={styles.noteContent}>
               <h3>{note.title}</h3>
               <p>{note.content}</p>
               <p className={styles.noteDate}>
-                Last updated: {new Date(note.updatedAt).toLocaleString()}
+                Last updated: {new Date(note.updated_at).toLocaleString()} {/* Changed from updatedAt to updated_at */}
               </p>
             </div>
             <div className={styles.noteActions}>
@@ -206,7 +224,7 @@ export default function NotesPage() {
                 Edit
               </button>
               <button
-                onClick={() => deleteNote(note._id)}
+                onClick={() => deleteNote(note.id)} 
                 className="btn btn-secondary"
               >
                 Delete
@@ -218,3 +236,5 @@ export default function NotesPage() {
     </div>
   )
 }
+
+

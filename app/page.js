@@ -39,7 +39,7 @@ export default function Home() {
             <p>Boost your focus with the 25/5 study technique.</p>
           </div>
           <div className="card">
-            <h3>GPA Calculator</h3>
+            <h3>CGPA Calculator</h3>
             <p>Track your academic performance and set goals.</p>
           </div>
           <div className="card">

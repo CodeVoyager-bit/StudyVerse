@@ -11,8 +11,6 @@ export const metadata = {
 
 export default function RootLayout({
   children,
-}: {
-  children: React.ReactNode
 }) {
   return (
     <html lang="en">
@@ -26,7 +24,7 @@ export default function RootLayout({
                 <Link href="/tasks">Tasks</Link>
                 <Link href="/notes">Notes</Link>
                 <Link href="/pomodoro">Pomodoro</Link>
-                <Link href="/gpa">GPA Calculator</Link>
+                <Link href="/gpa">CGPA Calculator</Link>
                 <Link href="/quotes">Daily Quotes</Link>
               </div>
               <div className="auth-buttons">

@@ -1,0 +1,117 @@
+.container {
+  max-width: 600px;
+  margin: 2rem auto;
+  padding: 2rem;
+  text-align: center;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.timerBox {
+  margin: 2rem 0;
+  padding: 2rem;
+  border-radius: 50%;
+  width: 300px;
+  height: 300px;
+  margin: 2rem auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(145deg, #f0f0f0, #ffffff);
+  box-shadow: 
+    20px 20px 60px #d9d9d9,
+    -20px -20px 60px #ffffff;
+}
+
+.mode {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #666;
+  margin-bottom: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.time {
+  font-size: 4rem;
+  font-weight: 700;
+  color: #333;
+  font-family: monospace;
+}
+
+.controls {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin: 2rem 0;
+}
+
+.controls button {
+  padding: 0.8rem 2rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.controls button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.controls button.btn-primary {
+  background: #4CAF50;
+  color: white;
+}
+
+.controls button.btn-secondary {
+  background: #FF5722;
+  color: white;
+}
+
+.controls button.btn {
+  background: #9E9E9E;
+  color: white;
+}
+
+.controls button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.cycles {
+  margin-top: 2rem;
+  font-size: 1.2rem;
+  color: #666;
+  font-weight: 500;
+}
+
+@media (max-width: 768px) {
+  .container {
+    margin: 1rem;
+    padding: 1rem;
+  }
+
+  .timerBox {
+    width: 250px;
+    height: 250px;
+    padding: 1.5rem;
+  }
+
+  .time {
+    font-size: 3rem;
+  }
+
+  .controls {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .controls button {
+    width: 100%;
+  }
+}
