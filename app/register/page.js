@@ -12,7 +12,7 @@ export default function RegisterPage() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const router = useRouter()
-
+const [message,changeMessage]=useState(false)
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')
@@ -31,13 +31,17 @@ export default function RegisterPage() {
       if (error) {
         throw new Error(error.message)
       }
-
-      router.push('/login?message=Check your email to confirm your account')
+      changeMessage("Check your email to confirm your account");
+      setTimeout(() => {
+        router.push('/login')
+      }, 5000);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred during registration')
     }
   }
-
+if (message){
+  return <h1>{message}</h1>
+}
   return (
     <div className={styles.container}>
       <div className={styles.card}>
