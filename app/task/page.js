@@ -10,26 +10,26 @@ export default function TasksPage() {
   const [tasks, setTasks] = useState([])
   const [newTask, setNewTask] = useState({ title: '', description: '', dueDate: '' })
   const [loading, setLoading] = useState(true)
-
+// console.log(loading)
   useEffect(() => {
     const checkUser = async () => {
       try {
         const { data: { session } } = await supabase.auth.getSession()
         if (!session) {
-          router.replace('/login')
+          router.push('/login')
           return
         }
         await fetchTasks()
       } catch (error) {
         console.error('Error checking session:', error)
-        router.replace('/login')
+        // router.replace('/')
       } finally {
         setLoading(false)
       }
     }
 
     checkUser()
-  }, ) // Add empty dependency array
+  }, ) 
 
   const fetchTasks = async () => {
     try {

@@ -11,22 +11,43 @@ export default function Navigation() {
   const router = useRouter()
 
   useEffect(() => {
-    const checkSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession()
+    checkSession()
+
+    // Set up auth state listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (session) {
         setAuthenticated(true)
         setUsername(session.user.user_metadata.username)
+      } else {
+        setAuthenticated(false)
+        setUsername('')
       }
+    })
+
+    return () => {
+      subscription?.unsubscribe()
     }
-    checkSession()
   }, [])
 
+  const checkSession = async () => {
+    const { data: { session } } = await supabase.auth.getSession()
+    if (session) {
+      setAuthenticated(true)
+      setUsername(session.user.user_metadata.username)
+    }
+  }
+
   const handleSignOut = async () => {
-    const { error } = await supabase.auth.signOut()
-    if (!error) {
+    try {
+      const { error } = await supabase.auth.signOut()
+      if (error) throw error
+      
       setAuthenticated(false)
       setUsername('')
       router.push('/')
+      router.refresh()
+    } catch (error) {
+      console.error('Error signing out:', error.message)
     }
   }
 
@@ -36,8 +57,8 @@ export default function Navigation() {
         <div className="nav-content">
           <Link href="/" className="logo">StudyVerse</Link>
           <div className="nav-links">
-            <Link href="/tasks">Tasks</Link>
-            <Link href="/notes">Notes</Link>
+            <Link href="/task">Tasks</Link>
+            <Link href="/note">Notes</Link>
             <Link href="/pomodoro">Pomodoro</Link>
             <Link href="/gpa">CGPA Calculator</Link>
             <Link href="/quotes">Daily Quotes</Link>

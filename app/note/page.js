@@ -14,8 +14,17 @@ export default function NotesPage() {
   const [editingNote, setEditingNote] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
-
-  /
+   useEffect(() => {
+    const checkUser = async () => {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session) {
+        router.push('/login')
+      } else {
+        fetchNotes()
+      }
+    }
+    checkUser()
+  }, ) 
   useEffect(() => {
     const checkUser = async () => {
       const { data: { session } } = await supabase.auth.getSession()
@@ -27,7 +36,7 @@ export default function NotesPage() {
     }
     checkUser()
   }, ) 
-  const handleSubmit = async (e) => {
+const handleSubmit = async (e) => {
   e.preventDefault()
   try {
     setError(null)
@@ -57,28 +66,31 @@ export default function NotesPage() {
   }
 }
 
-  // Update handleUpdate function to use 'id' instead of '_id'
   const handleUpdate = async (e) => {
     e.preventDefault()
     if (!editingNote) return
   
     try {
       setError(null)
-      const response = await fetch(`/api/notes/${editingNote.id}`, { // Changed from _id to id
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
+      const { data: { session } } = await supabase.auth.getSession()
+      
+      if (!session) {
+        router.push('/login')
+        return
+      }
+
+      const { error } = await supabase
+        .from('notes')
+        .update({
           title: editingNote.title,
           content: editingNote.content,
-        }),
-      })
-  
-      if (!response.ok) {
-        throw new Error('Failed to update note')
-      }
-  
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', editingNote.id)
+        .eq('user_id', session.user.id)
+
+      if (error) throw error
+
       setEditingNote(null)
       await fetchNotes()
     } catch (error) {
@@ -87,22 +99,26 @@ export default function NotesPage() {
     }
   }
 
-  const deleteNote = async (noteId) => {
-    try {
-      setError(null)
-      const response = await fetch(`/api/notes/${noteId}`, {
-        method: 'DELETE',
-      })
-
-      if (!response.ok) {
-        throw new Error('Failed to delete note')
-      }
-
-      await fetchNotes()
-    } catch (error) {
-      setError('Error deleting note. Please try again later.')
-      console.error('Error deleting note:', error)
+const deleteNote = async (noteId) => {
+   try {
+    const { data: { session } } = await supabase.auth.getSession()
+    
+    if (!session) {
+      router.push('/login')
+      return
     }
+
+    const { error } = await supabase
+      .from('notes')
+      .delete()
+      .eq('id', noteId)
+      .eq('user_id', session.user.id)
+
+    if (error) throw error
+    await fetchNotes()
+  } catch (error) {
+    console.error('Error deleting note:', error)
+  }
   }
 
   const fetchNotes = async () => {

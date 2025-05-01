@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState ,useEffect} from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import styles from './page.module.css'
@@ -11,7 +11,28 @@ export default function LoginPage() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const router = useRouter()
+  const [authenticated,changeAuthenticated]=useState(false)
 // let [d,changed]=useState('')
+//  const { data: { session } } =  supabase.auth.getSession()
+// console.log(session)
+useEffect(() => {
+    const checkUser = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession()
+        if (!session) {
+          return
+        }
+        changeAuthenticated(true)
+      } catch (error) {
+        console.error('Error checking session:', error)
+        // router.replace('/')
+      } 
+    }
+    checkUser()})
+    if (authenticated){
+      router.push('/')
+      return 
+    }
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')

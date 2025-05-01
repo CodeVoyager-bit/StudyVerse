@@ -22,6 +22,6 @@
       "@/*": ["./*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "app/notes/page.js", "app/pomodoro/page.js", "app/login/page.js", "app/register/page.js", "app/tasks/page.js", "app/layout.js", "app/page.js", "app/quotes/page.js"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "app/note/page.js", "app/pomodoro/page.js", "app/login/page.js", "app/register/page.js", "app/task/page.js", "app/layout.js", "app/page.js", "app/quotes/page.js"],
   "exclude": ["node_modules"]
 }
