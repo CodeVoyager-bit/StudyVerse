@@ -14,15 +14,36 @@ export default function NotesPage() {
   const [editingNote, setEditingNote] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [status, setStatus] = useState('loading')
+
+  //  useEffect(() => {
+  //   const checkUser = async () => {
+  //     const { data: { session } } = await supabase.auth.getSession()
+  //     if (!session) {
+  //       router.push('/login')
+  //     } else {
+  //       fetchNotes()
+  //     }
+  //   }
+  //   checkUser()
+  // }, ) 
    useEffect(() => {
     const checkUser = async () => {
-      const { data: { session } } = await supabase.auth.getSession()
-      if (!session) {
-        router.push('/login')
-      } else {
-        fetchNotes()
+      try {
+        const { data: { session } } = await supabase.auth.getSession()
+        if (!session) {
+          router.push('/login')
+          return
+        }
+        await fetchNotes()
+      } catch (error) {
+        console.error('Error checking session:', error)
+        // router.replace('/')
+      } finally {
+        setStatus(false)
       }
     }
+
     checkUser()
   }, ) 
   useEffect(() => {
