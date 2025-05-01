@@ -6,7 +6,7 @@ import Navigation from './components/Navigation'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata = {
-  title: 'StudyVerse - Your Study Companion',
+  title: 'StudyVerse',
   description: 'A comprehensive study management platform with task management, notes, pomodoro timer, and GPA calculator',
 }
 
