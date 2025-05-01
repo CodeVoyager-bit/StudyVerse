@@ -3,9 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import styles from './page.module.css'
-import { supabase } from '@/utils/supabase' // Add this
-// Remove next-auth import
-// import { useSession } from 'next-auth/react'
+import { supabase } from '@/utils/supabase' 
 
 
 
@@ -13,11 +11,11 @@ export default function NotesPage() {
   const router = useRouter()
   const [notes, setNotes] = useState([])
   const [newNote, setNewNote] = useState({ title: '', content: '' })
-  const [editingNote, setEditingNote] = useState<Note | null>(null)
+  const [editingNote, setEditingNote] = useState(null)
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const [error, setError] = useState(null)
 
-  // Update useEffect to include router in dependencies
+  /
   useEffect(() => {
     const checkUser = async () => {
       const { data: { session } } = await supabase.auth.getSession()
@@ -28,7 +26,7 @@ export default function NotesPage() {
       }
     }
     checkUser()
-  }, [router]) // Added router to dependency array
+  }, ) 
   const handleSubmit = async (e) => {
   e.preventDefault()
   try {

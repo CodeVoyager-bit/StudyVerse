@@ -12,17 +12,24 @@ export default function TasksPage() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    checkUser()
-  }, [])
-
-  const checkUser = async () => {
-    const { data: { session } } = await supabase.auth.getSession()
-    if (!session) {
-      router.push('/login')
-    } else {
-      fetchTasks()
+    const checkUser = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession()
+        if (!session) {
+          router.replace('/login')
+          return
+        }
+        await fetchTasks()
+      } catch (error) {
+        console.error('Error checking session:', error)
+        router.replace('/login')
+      } finally {
+        setLoading(false)
+      }
     }
-  }
+
+    checkUser()
+  }, ) // Add empty dependency array
 
   const fetchTasks = async () => {
     try {
@@ -37,8 +44,6 @@ export default function TasksPage() {
       setTasks(data || [])
     } catch (error) {
       console.error('Error fetching tasks:', error)
-    } finally {
-      setLoading(false)
     }
   }
 

@@ -125,4 +125,18 @@ body {
   outline: none;
   border-color: var(--primary-color);
   box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
-} 
+}
+
+.user-menu {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.user-menu span {
+  margin-right: 1rem;
+}
+
+.user-menu button {
+  margin-left: 0.5rem;
+}

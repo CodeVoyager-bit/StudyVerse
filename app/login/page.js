@@ -11,13 +11,13 @@ export default function LoginPage() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const router = useRouter()
-
+// let [d,changed]=useState('')
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')
 
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       })
@@ -25,13 +25,14 @@ export default function LoginPage() {
       if (error) {
         setError(error.message)
       } else {
-         router.push('/tasks')
+        await supabase.auth.setSession(data.session)
+        router.push('/') // Change this line to redirect to tasks
       }
     } catch (error) {
       setError(`An error occurred during login ${error}`)
     }
   }
-
+// console.log(d)
   return (
     <div className={styles.container}>
       <div className={styles.card}>

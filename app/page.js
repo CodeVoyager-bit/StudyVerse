@@ -8,19 +8,38 @@
 //  <Header></Header>
 //   </>
 // }
+'use client'
+import { supabase } from '@/utils/supabase'
+// import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import styles from './page.module.css'
-
+import { useEffect, useState } from 'react'
 export default function Home() {
+  let [authenticated,changeauthenticated]=useState(false)
+//  let  router = useRouter()
+  useEffect(() => {
+    console.log('User not authenticated')
+    const checkSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession()
+      console.log(session)
+      if (!session) {
+        console.log('User not authenticated')
+      } else {
+        console.log('User authenticated')
+        changeauthenticated(true)
+      }
+    }
+    checkSession()
+  }, )
   return (
     <div className={styles.home}>
       <section className={styles.hero}>
         <h1>Welcome to StudyVerse</h1>
         <p>Your all-in-one study companion for academic success</p>
-        <div className={styles.ctaButtons}>
+       {(!authenticated) ?<div className={styles.ctaButtons}>
           <Link href="/register" className="btn btn-primary">Get Started</Link>
           <Link href="/login" className="btn btn-secondary">Login</Link>
-        </div>
+        </div>:''}
       </section>
 
       <section className={styles.features}>
