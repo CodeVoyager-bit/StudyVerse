@@ -45,7 +45,7 @@ export default function NotesPage() {
     }
 
     checkUser()
-  }, ) 
+  }, []) 
   useEffect(() => {
     const checkUser = async () => {
       const { data: { session } } = await supabase.auth.getSession()
@@ -56,7 +56,7 @@ export default function NotesPage() {
       }
     }
     checkUser()
-  }, ) 
+  }, []) 
 const handleSubmit = async (e) => {
   e.preventDefault()
   try {
