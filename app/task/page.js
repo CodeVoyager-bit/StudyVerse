@@ -29,7 +29,7 @@ export default function TasksPage() {
     }
 
     checkUser()
-  }, ) 
+  }, []) 
 
   const fetchTasks = async () => {
     try {
