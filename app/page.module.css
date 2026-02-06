@@ -21,7 +21,6 @@
 
 .hero span {
   color: var(--primary);
-  /* Minimal accent instead of gradient */
 }
 
 .hero p {
@@ -62,5 +61,3 @@
   margin: 0 auto;
 }
 
-/* Note: .card style is now global in globals.css, so we removed it from here to avoid conflicts 
-   but we can add specific overrides if needed */
