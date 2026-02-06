@@ -1,13 +1,13 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  experimental: {
-    serverActions: {
-      bodySizeLimit: '2mb'
-    },
-  },
   images: {
-    domains: ['your-supabase-project-id.supabase.co'],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'your-supabase-project-id.supabase.co',
+      },
+    ],
   },
   output: 'standalone',
 };
