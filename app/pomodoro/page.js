@@ -3,8 +3,8 @@
 import { useState, useRef } from 'react'
 import styles from './page.module.css'  // Update this line
 
-const WORK_DURATION = 25 * 60 // 25 minutes in seconds
-const BREAK_DURATION = 5 * 60 // 5 minutes in seconds
+const WORK_DURATION = 25 * 60
+const BREAK_DURATION = 5 * 60
 
 export default function PomodoroPage() {
   const [isRunning, setIsRunning] = useState(false)

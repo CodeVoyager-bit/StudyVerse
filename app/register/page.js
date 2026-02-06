@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import styles from '../page.module.css'
+import styles from './page.module.css'
 import { supabase } from '@/utils/supabase'
 
 export default function RegisterPage() {
@@ -12,7 +12,7 @@ export default function RegisterPage() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const router = useRouter()
-const [message,changeMessage]=useState(false)
+  const [message, changeMessage] = useState(false)
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')
@@ -39,9 +39,9 @@ const [message,changeMessage]=useState(false)
       setError(err instanceof Error ? err.message : 'An error occurred during registration')
     }
   }
-if (message){
-  return <h1>{message}</h1>
-}
+  if (message) {
+    return <h1>{message}</h1>
+  }
   return (
     <div className={styles.container}>
       <div className={styles.card}>

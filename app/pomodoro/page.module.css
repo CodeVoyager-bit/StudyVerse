@@ -1,35 +1,57 @@
 .container {
   max-width: 600px;
-  margin: 2rem auto;
-  padding: 2rem;
+  margin: 3rem auto;
+  padding: 3rem 2rem;
   text-align: center;
-  background: #ffffff;
-  border-radius: 12px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  background: rgba(30, 41, 59, 0.3);
+  backdrop-filter: blur(12px);
+  border-radius: 2rem;
+  border: 1px solid var(--glass-border);
+}
+
+.container h1 {
+  font-size: 2.25rem;
+  margin-bottom: 2rem;
+  color: var(--text-main);
+  background: none;
+  font-weight: 700;
+  -webkit-text-fill-color: initial;
 }
 
 .timerBox {
-  margin: 2rem 0;
-  padding: 2rem;
+  margin: 3rem auto;
+  width: 260px;
+  height: 260px;
   border-radius: 50%;
-  width: 300px;
-  height: 300px;
-  margin: 2rem auto;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  background: linear-gradient(145deg, #f0f0f0, #ffffff);
-  box-shadow: 
-    20px 20px 60px #d9d9d9,
-    -20px -20px 60px #ffffff;
+  background: transparent;
+  border: 2px solid var(--glass-border);
+  /* Minimal border */
+  position: relative;
+}
+
+/* Subtle progress indicator idea (simplified) */
+.timerBox::after {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  border-radius: 50%;
+  border: 2px solid var(--primary);
+  opacity: 0.3;
+  z-index: -1;
 }
 
 .mode {
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: #666;
-  margin-bottom: 1rem;
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  margin-bottom: 0.5rem;
   text-transform: uppercase;
   letter-spacing: 2px;
 }
@@ -37,81 +59,80 @@
 .time {
   font-size: 4rem;
   font-weight: 700;
-  color: #333;
-  font-family: monospace;
+  color: var(--text-main);
+  font-family: 'Outfit', monospace;
+  text-shadow: none;
+  /* Removed heavy glow */
 }
 
 .controls {
   display: flex;
   gap: 1rem;
   justify-content: center;
-  margin: 2rem 0;
+  margin: 3rem 0 2rem;
 }
 
 .controls button {
   padding: 0.8rem 2rem;
   border: none;
-  border-radius: 8px;
+  border-radius: 9999px;
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
 }
 
 .controls button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+  transform: none;
 }
 
 .controls button.btn-primary {
-  background: #4CAF50;
-  color: white;
+  background: var(--primary);
+  color: #0f172a;
+  box-shadow: none;
 }
 
 .controls button.btn-secondary {
-  background: #FF5722;
-  color: white;
+  background: transparent;
+  border: 1px solid var(--glass-border);
+  color: var(--text-muted);
 }
 
 .controls button.btn {
-  background: #9E9E9E;
-  color: white;
+  background: transparent;
+  color: var(--text-muted);
 }
 
 .controls button:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  transform: translateY(-1px);
 }
 
 .cycles {
   margin-top: 2rem;
-  font-size: 1.2rem;
-  color: #666;
+  font-size: 1.1rem;
+  color: var(--text-muted);
   font-weight: 500;
 }
 
 @media (max-width: 768px) {
   .container {
-    margin: 1rem;
-    padding: 1rem;
+    margin: 2rem 1rem;
+    padding: 2rem 1rem;
   }
 
   .timerBox {
-    width: 250px;
-    height: 250px;
-    padding: 1.5rem;
+    width: 240px;
+    height: 240px;
   }
 
   .time {
-    font-size: 3rem;
+    font-size: 3.5rem;
   }
 
   .controls {
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-
-  .controls button {
-    width: 100%;
+    flex-wrap: wrap;
+    gap: 1rem;
   }
 }

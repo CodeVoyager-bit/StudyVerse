@@ -1,6 +1,6 @@
 'use client'
 
-import { useState ,useEffect} from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import styles from './page.module.css'
@@ -10,12 +10,11 @@ export default function LoginPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
+  const [username, setUsername] = useState('') // Note: username not typically used in login, but kept state if needed or remove
   const router = useRouter()
-  const [authenticated,changeAuthenticated]=useState(false)
-// let [d,changed]=useState('')
-//  const { data: { session } } =  supabase.auth.getSession()
-// console.log(session)
-useEffect(() => {
+  const [authenticated, changeAuthenticated] = useState(false)
+
+  useEffect(() => {
     const checkUser = async () => {
       try {
         const { data: { session } } = await supabase.auth.getSession()
@@ -25,14 +24,15 @@ useEffect(() => {
         changeAuthenticated(true)
       } catch (error) {
         console.error('Error checking session:', error)
-        // router.replace('/')
-      } 
+        //
+      }
     }
-    checkUser()})
-    if (authenticated){
-      router.push('/')
-      return 
-    }
+    checkUser()
+  })
+  if (authenticated) {
+    router.push('/')
+    return
+  }
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')
@@ -47,13 +47,13 @@ useEffect(() => {
         setError(error.message)
       } else {
         await supabase.auth.setSession(data.session)
-        router.push('/') // Change this line to redirect to tasks
+        router.push('/')
       }
     } catch (error) {
       setError(`An error occurred during login ${error}`)
     }
   }
-// console.log(d)
+
   return (
     <div className={styles.container}>
       <div className={styles.card}>

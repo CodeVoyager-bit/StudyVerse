@@ -13,7 +13,7 @@ export default function Navigation() {
   useEffect(() => {
     checkSession()
 
-    // Set up auth state listener
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (session) {
         setAuthenticated(true)
@@ -41,7 +41,7 @@ export default function Navigation() {
     try {
       const { error } = await supabase.auth.signOut()
       if (error) throw error
-      
+
       setAuthenticated(false)
       setUsername('')
       router.push('/')
@@ -52,29 +52,36 @@ export default function Navigation() {
   }
 
   return (
-    <nav className="navbar">
-      <div className="container">
-        <div className="nav-content">
-          <Link href="/" className="logo">StudyVerse</Link>
-          <div className="nav-links">
-            <Link href="/task">Tasks</Link>
-            <Link href="/note">Notes</Link>
-            <Link href="/pomodoro">Pomodoro</Link>
-            <Link href="/gpa">CGPA Calculator</Link>
-            <Link href="/quotes">Daily Quotes</Link>
+    <nav className="glass-nav sticky top-0 z-50">
+      <div className="container mx-auto px-6 py-4">
+        <div className="flex justify-between items-center">
+          <Link href="/" className="text-xl font-semibold text-white tracking-tight hover:opacity-80 transition-opacity">
+            StudyVerse
+          </Link>
+
+          <div className="hidden md:flex items-center gap-8">
+            <Link href="/task" className="text-sm font-medium text-gray-400 hover:text-white transition-colors">Tasks</Link>
+            <Link href="/note" className="text-sm font-medium text-gray-400 hover:text-white transition-colors">Notes</Link>
+            <Link href="/pomodoro" className="text-sm font-medium text-gray-400 hover:text-white transition-colors">Pomodoro</Link>
+            <Link href="/gpa" className="text-sm font-medium text-gray-400 hover:text-white transition-colors">CGPA</Link>
+            <Link href="/quotes" className="text-sm font-medium text-gray-400 hover:text-white transition-colors">Quotes</Link>
           </div>
-          <div className="auth-buttons">
+
+          <div className="flex items-center gap-4">
             {authenticated ? (
-              <div className="user-menu">
-                <span>Welcome, {username}</span>
-                <button onClick={handleSignOut} className="btn btn-secondary">
+              <div className="flex items-center gap-4">
+                <span className="text-sm text-gray-300">Hi, {username}</span>
+                <button
+                  onClick={handleSignOut}
+                  className="btn btn-secondary text-sm px-4 py-2"
+                >
                   Sign Out
                 </button>
               </div>
             ) : (
-              <div>
-                <Link href="/login" className="btn btn-secondary">Login</Link>
-                <Link href="/register" className="btn btn-primary">Register</Link>
+              <div className="flex items-center gap-4">
+                <Link href="/login" className="btn btn-secondary text-sm px-5 py-2">Login</Link>
+                <Link href="/register" className="btn btn-primary text-sm px-5 py-2">Get Started</Link>
               </div>
             )}
           </div>

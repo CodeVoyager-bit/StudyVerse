@@ -1,22 +1,12 @@
-// 'use client'
-// import { useState, useEffect } from "react";
-// import Header  from './Header/header.js'
-// export default function App(){
-//   const [count,setCount]=useState(0)
-//   useEffect(()=>{console.log('hi')},[count])
-//   return <>
-//  <Header></Header>
-//   </>
-// }
 'use client'
 import { supabase } from '@/utils/supabase'
-// import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import styles from './page.module.css'
 import { useEffect, useState } from 'react'
+
 export default function Home() {
-  let [authenticated,changeauthenticated]=useState(false)
-//  let  router = useRouter()
+  let [authenticated, changeauthenticated] = useState(false)
+
   useEffect(() => {
     console.log('User not authenticated')
     const checkSession = async () => {
@@ -30,44 +20,49 @@ export default function Home() {
       }
     }
     checkSession()
-  }, )
+  },)
   return (
     <div className={styles.home}>
       <section className={styles.hero}>
-        <h1>Welcome to StudyVerse</h1>
-        <p>Your all-in-one study companion for academic success</p>
-       {(!authenticated) ?<div className={styles.ctaButtons}>
-          <Link href="/register" className="btn btn-primary">Get Started</Link>
+        <div className="animate-float">
+          <h1>Welcome to <span>StudyVerse</span></h1>
+        </div>
+        <p>Your all-in-one study universe. Manage tasks, track grades, and focus better.</p>
+        {(!authenticated) ? <div className={styles.ctaButtons}>
+          <Link href="/register" className="btn btn-primary glow-hover">Get Started</Link>
           <Link href="/login" className="btn btn-secondary">Login</Link>
-        </div>:''}
+        </div> :
+          <div className={styles.ctaButtons}>
+            <Link href="/task" className="btn btn-primary glow-hover">Go to Task Manager</Link>
+          </div>}
       </section>
 
       <section className={styles.features}>
-        <h2>Features</h2>
+        <h2>Explore the Universe</h2>
         <div className={styles.featureGrid}>
           <div className="card">
-            <h3>Task Manager</h3>
-            <p>Organize your study tasks, set deadlines, and track your progress.</p>
+            <h3>✨ Task Manager</h3>
+            <p>Organize your study tasks, set deadlines, and track your progress with intuitive lists.</p>
           </div>
           <div className="card">
-            <h3>Notes Section</h3>
-            <p>Create and organize your study notes with ease.</p>
+            <h3>📝 Notes Section</h3>
+            <p>Create and organize your study notes with ease. Keep your thoughts structured.</p>
           </div>
           <div className="card">
-            <h3>Pomodoro Timer</h3>
-            <p>Boost your focus with the 25/5 study technique.</p>
+            <h3>⏱️ Pomodoro Timer</h3>
+            <p>Boost your focus with the 25/5 study technique. Stay productive without burnout.</p>
           </div>
           <div className="card">
-            <h3>CGPA Calculator</h3>
-            <p>Track your academic performance and set goals.</p>
+            <h3>🎓 CGPA Calculator</h3>
+            <p>Track your academic performance and set goals. Know exactly where you stand.</p>
           </div>
           <div className="card">
-            <h3>Daily Quotes</h3>
-            <p>Stay motivated with inspirational quotes every day.</p>
+            <h3>💡 Daily Quotes</h3>
+            <p>Stay motivated with inspirational quotes every day. Feed your mind with positivity.</p>
           </div>
           <div className="card">
-            <h3>Cloud Sync</h3>
-            <p>Access your study materials from anywhere, anytime.</p>
+            <h3>☁️ Cloud Sync</h3>
+            <p>Access your study materials from anywhere, anytime. Your data follows you.</p>
           </div>
         </div>
       </section>

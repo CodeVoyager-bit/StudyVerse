@@ -1,68 +1,66 @@
 .home {
-  min-height: 100vh;
+  min-height: calc(100vh - 80px);
+  display: flex;
+  flex-direction: column;
 }
 
 .hero {
   text-align: center;
-  padding: 4rem 0;
-  background: linear-gradient(135deg, var(--primary-color) 0%, #4338CA 100%);
-  color: white;
-  margin-bottom: 4rem;
+  padding: 6rem 1rem 4rem;
+  margin-bottom: 2rem;
+  position: relative;
 }
 
 .hero h1 {
-  font-size: 3rem;
+  font-size: 3.5rem;
+  font-weight: 700;
   margin-bottom: 1rem;
+  letter-spacing: -0.03em;
+  color: var(--text-main);
+}
+
+.hero span {
+  color: var(--primary);
+  /* Minimal accent instead of gradient */
 }
 
 .hero p {
-  font-size: 1.25rem;
-  margin-bottom: 2rem;
-  opacity: 0.9;
+  font-size: 1.125rem;
+  margin-bottom: 2.5rem;
+  color: var(--text-muted);
+  max-width: 500px;
+  margin-left: auto;
+  margin-right: auto;
+  line-height: 1.7;
 }
 
 .ctaButtons {
   display: flex;
   gap: 1rem;
   justify-content: center;
+  align-items: center;
 }
 
 .features {
-  padding: 2rem 0;
+  padding: 2rem 1rem 6rem;
 }
 
 .features h2 {
   text-align: center;
-  font-size: 2rem;
-  margin-bottom: 2rem;
+  font-size: 1.75rem;
+  font-weight: 600;
+  margin-bottom: 3rem;
+  color: var(--text-main);
+  letter-spacing: -0.02em;
 }
 
 .featureGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
   gap: 2rem;
-  padding: 0 1rem;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
-.card {
-  background: white;
-  border-radius: 0.5rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  padding: 1.5rem;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-.card h3 {
-  color: var(--primary-color);
-  margin-bottom: 1rem;
-}
-
-.card p {
-  color: var(--text-color);
-  opacity: 0.8;
-} 
+/* Note: .card style is now global in globals.css, so we removed it from here to avoid conflicts 
+   but we can add specific overrides if needed */

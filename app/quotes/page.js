@@ -13,8 +13,7 @@ export default function QuotesPage() {
     try {
       setLoading(true)
       setError(null)
-      
-      // Get total count of quotes
+
       const { count } = await supabase
         .from('quotes')
         .select('*', { count: 'exact', head: true })
@@ -25,10 +24,8 @@ export default function QuotesPage() {
         return
       }
 
-      // Get a random offset
       const randomOffset = Math.floor(Math.random() * count)
 
-      // Fetch one random quote
       const { data, error } = await supabase
         .from('quotes')
         .select('*')
@@ -61,9 +58,9 @@ export default function QuotesPage() {
           <p>{quote.text}</p>
           <footer>— {quote.author}</footer>
         </blockquote>
-        <button 
+        <button
           onClick={fetchRandomQuote}
-          className={styles.refreshButton}
+          className="btn btn-primary"
         >
           New Quote
         </button>

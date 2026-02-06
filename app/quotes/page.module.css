@@ -1,63 +1,86 @@
 .container {
-  max-width: 800px;
-  margin: 2rem auto;
+  max-width: 900px;
+  margin: 4rem auto;
   padding: 2rem;
+  min-height: 60vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .quoteCard {
-  background: #ffffff;
-  padding: 2rem;
-  border-radius: 12px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  background: rgba(30, 41, 59, 0.3);
+  backdrop-filter: blur(12px);
+  padding: 4rem;
+  border-radius: 2rem;
+  border: 1px solid var(--glass-border);
   text-align: center;
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.quoteCard:hover {
+  background: rgba(30, 41, 59, 0.4);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.quoteCard::before {
+  content: '"';
+  position: absolute;
+  top: 20px;
+  left: 40px;
+  font-size: 10rem;
+  font-family: serif;
+  color: var(--primary);
+  opacity: 0.05;
+  /* Much more subtle */
+  pointer-events: none;
 }
 
 .quote {
   margin: 0;
   padding: 1rem 0;
+  position: relative;
+  z-index: 1;
 }
 
 .quote p {
-  font-size: 1.5rem;
-  line-height: 1.6;
-  color: #333;
-  margin-bottom: 1rem;
-  font-style: italic;
+  font-size: 2.25rem;
+  line-height: 1.4;
+  color: var(--text-main);
+  margin-bottom: 2rem;
+  font-weight: 300;
+  text-shadow: none;
 }
 
 .quote footer {
-  font-size: 1.1rem;
-  color: #666;
+  font-size: 1.125rem;
+  color: var(--text-muted);
   font-weight: 500;
+  display: inline-block;
+  padding-top: 1rem;
+  border-top: 1px solid var(--glass-border);
 }
 
 .refreshButton {
-  margin-top: 2rem;
-  padding: 0.8rem 2rem;
-  background: #4CAF50;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.refreshButton:hover {
-  background: #45a049;
-  transform: translateY(-2px);
+  /* Handled by global .btn-primary, specific overrides here if needed */
+  margin-top: 3rem;
 }
 
 .loading {
   text-align: center;
   padding: 2rem;
-  font-size: 1.2rem;
-  color: #666;
+  font-size: 1.25rem;
+  color: var(--primary);
 }
 
 .error {
   text-align: center;
   padding: 2rem;
-  color: #d32f2f;
-  font-size: 1.2rem;
+  color: #fca5a5;
+  font-size: 1.25rem;
+  background: rgba(220, 38, 38, 0.1);
+  border-radius: 1rem;
 }

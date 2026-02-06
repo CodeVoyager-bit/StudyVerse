@@ -66,11 +66,11 @@ export default function GPACalculator() {
   return (
     <div className={styles.container}>
       <h1>CGPA Calculator</h1>
-      
+
       {semesters.map((semester, semesterIndex) => (
         <div key={semesterIndex} className={styles.semester}>
           <h3>Semester {semesterIndex + 1}</h3>
-          
+
           {semester.courses.map((course, courseIndex) => (
             <div key={courseIndex} className={styles.course}>
               <select
@@ -96,7 +96,7 @@ export default function GPACalculator() {
               </select>
             </div>
           ))}
-          
+
           <button onClick={() => addCourse(semesterIndex)} className={styles.addButton}>
             Add Course
           </button>
@@ -109,11 +109,11 @@ export default function GPACalculator() {
         </div>
       ))}
 
-      <button onClick={addSemester} className={styles.addButton}>
+      <button onClick={addSemester} className="btn btn-secondary" style={{ marginRight: '1rem' }}>
         Add Semester
       </button>
 
-      <button onClick={calculateCGPA} className={styles.calculateButton}>
+      <button onClick={calculateCGPA} className="btn btn-primary">
         Calculate CGPA
       </button>
 
