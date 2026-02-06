@@ -10,7 +10,6 @@ export default function LoginPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
-  const [username, setUsername] = useState('') // Note: username not typically used in login, but kept state if needed or remove
   const router = useRouter()
   const [authenticated, changeAuthenticated] = useState(false)
 

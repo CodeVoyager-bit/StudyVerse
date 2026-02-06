@@ -10,7 +10,7 @@ export default function TasksPage() {
   const [tasks, setTasks] = useState([])
   const [newTask, setNewTask] = useState({ title: '', description: '', dueDate: '' })
   const [loading, setLoading] = useState(true)
-// console.log(loading)
+  // console.log(loading)
   useEffect(() => {
     const checkUser = async () => {
       try {
@@ -29,7 +29,7 @@ export default function TasksPage() {
     }
 
     checkUser()
-  }, []) 
+  }, [router])
 
   const fetchTasks = async () => {
     try {
@@ -105,7 +105,7 @@ export default function TasksPage() {
   return (
     <div className={styles.container}>
       <h1>Task Manager</h1>
-      
+
       <form onSubmit={handleSubmit} className={styles.taskForm}>
         <div className="form-group">
           <input

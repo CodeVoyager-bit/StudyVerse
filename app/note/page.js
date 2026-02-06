@@ -31,7 +31,7 @@ export default function NotesPage() {
     }
 
     checkUser()
-  }, [])
+  }, [router])
 
   const handleSubmit = async (e) => {
     e.preventDefault()
