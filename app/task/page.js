@@ -49,6 +49,7 @@ export default function TasksPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+    // console.log(newTask)
     try {
       const { data: { session } } = await supabase.auth.getSession()
       const { error } = await supabase
@@ -57,6 +58,7 @@ export default function TasksPage() {
           title: newTask.title,
           description: newTask.description,
           due_date: newTask.dueDate,
+          // due_date: '2026-02-23T16:15',
           user_id: session.user.id,
           completed: false
         })
@@ -125,6 +127,7 @@ export default function TasksPage() {
             className="form-control"
           />
         </div>
+        {/* {console.log(newTask)} */}
         <div className="form-group">
           <input
             type="datetime-local"
