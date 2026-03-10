@@ -154,7 +154,7 @@ body {
   border: 1px solid var(--glass-border);
   border-radius: 8px;
   color: var(--text-main);
-  color-scheme: white;
+  color-scheme: dark;
   font-family: inherit;
   font-size: 0.95rem;
   transition: all 0.2s ease;
