@@ -40,26 +40,36 @@ export default function Home() {
       <section className={styles.features}>
         <h2>Explore the Universe</h2>
         <div className={styles.featureGrid}>
+           <Link href="/task" >
           <div className="card">
             <h3>✨ Task Manager</h3>
             <p>Organize your study tasks, set deadlines, and track your progress with intuitive lists.</p>
           </div>
-          <div className="card">
+          </Link>
+          <Link href="/note" >
+          <div className="card" >
             <h3>📝 Notes Section</h3>
             <p>Create and organize your study notes with ease. Keep your thoughts structured.</p>
           </div>
+          </Link>
+          <Link href="/pomodoro" >
           <div className="card">
             <h3>⏱️ Pomodoro Timer</h3>
             <p>Boost your focus with the 25/5 study technique. Stay productive without burnout.</p>
           </div>
+          </Link>
+          <Link href="/gpa" >
           <div className="card">
             <h3>🎓 CGPA Calculator</h3>
             <p>Track your academic performance and set goals. Know exactly where you stand.</p>
           </div>
+          </Link>
+          <Link href="/quotes" >
           <div className="card">
             <h3>💡 Daily Quotes</h3>
             <p>Stay motivated with inspirational quotes every day. Feed your mind with positivity.</p>
           </div>
+          </Link>
           <div className="card">
             <h3>☁️ Cloud Sync</h3>
             <p>Access your study materials from anywhere, anytime. Your data follows you.</p>
