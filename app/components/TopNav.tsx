@@ -23,7 +23,8 @@ export default function TopNav() {
             <Link href="/dashboard" className="btn btn-primary btn-sm">Open StudyVerse</Link>
           ) : (
             <>
-              <Link href="/login" className="btn btn-ghost btn-sm">Log in</Link>
+              {/* Hidden on very narrow phones; the hero and auth pages carry their own log-in links. */}
+              <Link href="/login" className="btn btn-ghost btn-sm hidden min-[380px]:inline-flex">Log in</Link>
               <Link href="/register" className="btn btn-primary btn-sm">Get started</Link>
             </>
           )}

@@ -9,7 +9,8 @@ Live: https://study-verse-ten.vercel.app
 
 1. `npm install`
 2. Copy `.env.example` to `.env.local` and fill in your Supabase project URL and anon key
-   (Supabase Dashboard → Project Settings → API).
+   (Supabase Dashboard → Project Settings → API), plus `NEXT_PUBLIC_GOOGLE_CLIENT_ID`
+   (Google Cloud → Google Auth Platform → Clients) for Google's own sign-in button.
 3. In the Supabase Dashboard → SQL Editor, run the migrations in order:
    - `supabase/migrations/0001_schema_and_rls.sql` — tables, row-level security, seeded quotes
    - `supabase/migrations/0002_v2.sql` — pomodoro sessions, planner blocks, saved CGPA, note tags
