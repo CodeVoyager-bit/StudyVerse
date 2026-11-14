@@ -33,14 +33,6 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    "app/note/page.js",
-    "app/pomodoro/page.js",
-    "app/login/page.js",
-    "app/register/page.js",
-    "app/task/page.js",
-    "app/layout.js",
-    "app/page.js",
-    "app/quotes/page.js",
     ".next/dev/types/**/*.ts"
   ],
   "exclude": [

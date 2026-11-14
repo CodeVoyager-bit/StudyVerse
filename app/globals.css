@@ -1,208 +1,289 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
 @import "tailwindcss";
 
-:root {
-  /* Minimalistic Universe Theme */
-  --bg-deep: #0f172a;
-  --bg-surface: #1e293b;
-  --primary: #818cf8;
-  /* Soft Indigo */
-  --primary-glow: #a5b4fc;
-  --secondary: #f472b6;
-  /* Soft Pink */
-  --accent: #22d3ee;
-  /* Soft Cyan */
-  --text-main: #f1f5f9;
-  --text-muted: #94a3b8;
-  --glass-border: rgba(255, 255, 255, 0.05);
-  /* subtler border */
-  --glass-bg: rgba(15, 23, 42, 0.6);
-  /* more transparent */
+@theme inline {
+  --font-sans: var(--font-bricolage), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-space-mono), ui-monospace, monospace;
+  --font-hand: var(--font-caveat), "Comic Sans MS", cursive;
 }
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+/*
+  "Study zine": a student's desk. Squared exercise-book paper, ink outlines, highlighters, sticky notes.
+  Light only (by request). Contrast on surface: ink 17.7, muted 8.2, faint 5.9, accent 5.4, danger 5.9.
+  Colour meanings, kept fixed everywhere:
+    accent (blue)   primary actions, focus, selected states, progress
+    yellow          highlighter: today, current, emphasis
+    pink/mint/orange/sky   content-layer fun: tiles, sticky notes, stickers, planner blocks
+    success/danger/warning status only
+  On pink and orange fills, text is always full ink (muted text fails there).
+*/
+@theme {
+  --color-canvas: #f2f4fa;
+  --color-surface: #fdfdfc;
+  --color-raised: #eef1f8;
+  --color-line: #dfe3ee;
+  --color-line-strong: #c3c8d6;
+  --color-edge: #16161d;
+  --color-ink: #16161d;
+  --color-muted: #4a4d5e;
+  --color-faint: #5f6374;
+  --color-accent: #2f5bea;
+  --color-accent-hover: #2449c9;
+  --color-on-accent: #fdfdfc;
+  --color-accent-soft: #e2e9ff;
+  --color-success: #0f7a46;
+  --color-success-soft: #d6f6e6;
+  --color-warning: #8a5a00;
+  --color-warning-soft: #fff0bf;
+  --color-danger: #bf2235;
+  --color-danger-soft: #ffe1e5;
 
-body {
-  font-family: 'Outfit', sans-serif;
-  background-color: var(--bg-deep);
-  /* Subtle ambient background */
-  background-image:
-    radial-gradient(circle at 15% 50%, rgba(99, 102, 241, 0.08), transparent 25%),
-    radial-gradient(circle at 85% 30%, rgba(236, 72, 153, 0.08), transparent 25%);
-  background-attachment: fixed;
-  color: var(--text-main);
-  line-height: 1.6;
-  min-height: 100vh;
-  overflow-x: hidden;
-}
+  --color-yellow: #ffd43b;
+  --color-pink: #ff7ab6;
+  --color-mint: #5ce3ab;
+  --color-orange: #ff9147;
+  --color-sky: #9cc2ff;
 
-.container {
-  max-width: 1000px;
-  /* Tighter container for focus */
-  margin: 0 auto;
-  padding: 0 1.5rem;
-}
+  --color-cat-blue: #dde7ff;
+  --color-cat-blue-ink: #1f45c7;
+  --color-cat-green: #d3f7e5;
+  --color-cat-green-ink: #0b6b3d;
+  --color-cat-amber: #fff0bf;
+  --color-cat-amber-ink: #7a5100;
+  --color-cat-rose: #ffe0ee;
+  --color-cat-rose-ink: #a8174f;
+  --color-cat-slate: #e6e9f2;
+  --color-cat-slate-ink: #363a4c;
 
-/* Minimal Glass Utilities */
-.glass-panel {
-  background: var(--glass-bg);
-  backdrop-filter: blur(8px);
-  /* Reduced blur */
-  -webkit-backdrop-filter: blur(8px);
-  border: 1px solid var(--glass-border);
-  border-radius: 12px;
-}
+  /* Shape lock: cards 20px, controls 12px, chips/tabs/stickers full pill or circle. */
+  --radius-card: 20px;
+  --radius-control: 12px;
 
-.glass-nav {
-  background: rgba(15, 23, 42, 0.7);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-bottom: 1px solid var(--glass-border);
-}
+  /* Hard offset "sticker" shadows in ink. */
+  --shadow-card: 4px 4px 0 var(--color-edge);
+  --shadow-pop: 7px 7px 0 var(--color-edge);
+  --shadow-sm: 2px 2px 0 var(--color-edge);
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
 
-/* Typography & Effects */
-.gradient-text {
-  background: linear-gradient(to right, #e2e8f0, #94a3b8);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  font-weight: 600;
-}
+  --animate-rise: rise 0.55s var(--ease-spring) both;
+  --animate-grow: grow 0.7s var(--ease-spring) both;
+  --animate-shimmer: shimmer 1.6s linear infinite;
+  --animate-wiggle: wiggle 1.8s ease-in-out infinite;
+  --animate-blob: blob 9s ease-in-out infinite;
+  --animate-marquee: marquee 28s linear infinite;
 
-/* Minimal Button Styles */
-.btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.6rem 1.5rem;
-  border-radius: 8px;
-  /* Slightly squared pill */
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  text-decoration: none;
-  font-size: 0.95rem;
-  border: 1px solid transparent;
-}
-
-.btn-primary {
-  background: var(--primary);
-  color: #0f172a;
-  /* Dark text for contrast */
-  border: 1px solid var(--primary);
-}
-
-.btn-primary:hover {
-  background: var(--primary-glow);
-  border-color: var(--primary-glow);
-  transform: translateY(-1px);
-}
-
-.btn-secondary {
-  background: transparent;
-  border: 1px solid var(--glass-border);
-  color: var(--text-muted);
-}
-
-.btn-secondary:hover {
-  border-color: var(--text-main);
-  color: var(--text-main);
-  background: rgba(255, 255, 255, 0.03);
-}
-
-/* Clean Cards */
-.card {
-  background: rgba(30, 41, 59, 0.3);
-  border: 1px solid var(--glass-border);
-  border-radius: 12px;
-  padding: 2rem;
-  transition: all 0.3s ease;
-}
-
-.card:hover {
-  background: rgba(30, 41, 59, 0.5);
-  border-color: rgba(255, 255, 255, 0.1);
-  transform: translateY(-2px);
-}
-
-.card h3 {
-  color: var(--text-main);
-  margin-bottom: 0.5rem;
-  font-size: 1.1rem;
-  font-weight: 600;
-}
-
-.card p {
-  color: var(--text-muted);
-  font-size: 0.95rem;
-  line-height: 1.6;
-}
-
-/* Form Styles */
-.form-group {
-  margin-bottom: 1.25rem;
-}
-
-.form-control {
-  width: 100%;
-  padding: 0.75rem 1rem;
-  background: rgba(15, 23, 42, 0.5);
-  border: 1px solid var(--glass-border);
-  border-radius: 8px;
-  color: var(--text-main);
-  color-scheme: dark;
-  font-family: inherit;
-  font-size: 0.95rem;
-  transition: all 0.2s ease;
-}
-
-.form-control:focus {
-  outline: none;
-  border-color: var(--primary);
-  background: rgba(15, 23, 42, 0.8);
-}
-
-.form-control::placeholder {
-  color: var(--text-muted);
-  opacity: 0.5;
-}
-
-/* Animation */
-.animate-float {
-  animation: float 8s ease-in-out infinite;
-  /* Slower float */
-}
-
-@keyframes float {
-
-  0%,
-  100% {
-    transform: translateY(0);
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(14px) scale(0.97) rotate(-1deg); }
   }
-
-  50% {
-    transform: translateY(-5px);
+  @keyframes grow { from { transform: scaleY(0); } }
+  @keyframes shimmer { to { background-position: -200% 0; } }
+  @keyframes wiggle {
+    0%, 100% { transform: rotate(-6deg) scale(1); }
+    50% { transform: rotate(6deg) scale(1.08); }
+  }
+  @keyframes blob {
+    0%, 100% { border-radius: 58% 42% 46% 54% / 52% 44% 56% 48%; }
+    33% { border-radius: 44% 56% 60% 40% / 42% 58% 42% 58%; }
+    66% { border-radius: 52% 48% 38% 62% / 60% 40% 60% 40%; }
+  }
+  @keyframes marquee { to { transform: translateX(-50%); } }
+  @keyframes hl-swipe { from { background-size: 0% 0.42em; } }
+  @keyframes pop-in {
+    from { opacity: 0; transform: translateY(40px) rotate(calc(var(--r, 0deg) * 5)) scale(0.6); }
   }
 }
 
-/* Scrollbar */
-::-webkit-scrollbar {
-  width: 6px;
+@layer base {
+  :root { color-scheme: light; }
+  html {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    accent-color: var(--color-accent);
+  }
+  @media (pointer: fine) { html { overscroll-behavior: none; } }
+  body {
+    background-color: var(--color-canvas);
+    /* Squared exercise-book paper. A static background on body, so it costs nothing to scroll. */
+    background-image:
+      linear-gradient(rgb(47 91 234 / 0.07) 1px, transparent 1px),
+      linear-gradient(90deg, rgb(47 91 234 / 0.07) 1px, transparent 1px);
+    background-size: 26px 26px;
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    line-height: 1.55;
+    min-height: 100dvh;
+    -webkit-font-smoothing: antialiased;
+  }
+  h1, h2, h3 { letter-spacing: -0.025em; text-wrap: balance; font-weight: 800; }
+  p { text-wrap: pretty; }
+  ::selection { background: var(--color-yellow); color: var(--color-ink); }
+  :focus-visible { outline: 3px solid var(--color-accent); outline-offset: 3px; border-radius: 8px; }
+  [id] { scroll-margin-top: 5rem; }
 }
 
-::-webkit-scrollbar-track {
-  background: transparent;
+@layer components {
+  .skip-link {
+    position: absolute; left: 1rem; top: -4rem; z-index: 100;
+    background: var(--color-ink); color: var(--color-surface);
+    padding: 0.5rem 0.9rem; border-radius: var(--radius-control); font-weight: 700;
+  }
+  .skip-link:focus-visible { top: 1rem; }
+
+  .page { max-width: 1140px; margin-inline: auto; padding: 1.5rem 1.25rem 3rem; }
+  @media (min-width: 1024px) { .page { padding: 2rem 2.25rem 3rem; } }
+  .page-title { font-size: clamp(2rem, 4vw, 2.75rem); line-height: 1.05; font-weight: 800; }
+  .page-sub { color: var(--color-muted); margin-top: 0.4rem; font-weight: 500; }
+  .section-title { font-size: 1.05rem; font-weight: 800; letter-spacing: -0.01em; }
+  .hand { font-family: var(--font-hand); font-weight: 700; letter-spacing: 0; }
+
+  /* Highlighter swipe behind a word. Set --hl to change the pen. */
+  .hl {
+    --hl: var(--color-yellow);
+    background-image: linear-gradient(100deg, transparent 0.15em, var(--hl) 0.25em, var(--hl) calc(100% - 0.2em), transparent calc(100% - 0.1em));
+    background-repeat: no-repeat;
+    background-size: 100% 0.42em;
+    background-position: 0 86%;
+    padding-inline: 0.06em;
+    animation: hl-swipe 0.7s var(--ease-out-expo) 0.35s both;
+  }
+
+  .card {
+    position: relative;
+    background: var(--color-surface);
+    border: 2px solid var(--color-edge);
+    border-radius: var(--radius-card);
+    box-shadow: var(--shadow-card);
+    padding: 1.25rem;
+  }
+  .card-link { transition: transform 180ms var(--ease-spring), box-shadow 180ms var(--ease-spring); }
+  .card-link:hover { transform: translate(-3px, -3px) rotate(-0.4deg); box-shadow: var(--shadow-pop); }
+  .card-link:active { transform: translate(2px, 2px); box-shadow: var(--shadow-sm); }
+
+  /* Washi tape strip on top of a card or sticky note. */
+  .tape::before {
+    content: ""; position: absolute; top: -12px; left: 50%; width: 92px; height: 24px;
+    transform: translateX(-50%) rotate(-3deg);
+    background: repeating-linear-gradient(45deg, rgb(255 255 255 / 0.55) 0 6px, rgb(255 255 255 / 0.25) 6px 12px), var(--tape, var(--color-sky));
+    opacity: 0.85; border-radius: 3px; pointer-events: none;
+  }
+
+  .sticker {
+    display: grid; place-items: center; border-radius: 999px;
+    background: var(--color-surface); border: 2.5px solid var(--color-edge); box-shadow: var(--shadow-sm);
+  }
+
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 0.45rem;
+    height: 2.75rem; padding-inline: 1.1rem; border-radius: var(--radius-control);
+    font-weight: 700; font-size: 0.95rem; white-space: nowrap; cursor: pointer; user-select: none;
+    background: var(--color-surface); color: var(--color-ink);
+    border: 2px solid var(--color-edge); box-shadow: var(--shadow-sm);
+    transition: transform 150ms var(--ease-spring), box-shadow 150ms var(--ease-spring), background-color 150ms ease;
+  }
+  .btn:hover:not(:disabled) { transform: translate(-2px, -2px); box-shadow: 4px 4px 0 var(--color-edge); background: var(--color-yellow); }
+  .btn:active:not(:disabled) { transform: translate(2px, 2px); box-shadow: 0 0 0 var(--color-edge); }
+  .btn:disabled { opacity: 0.55; cursor: not-allowed; }
+  .btn-primary { background: var(--color-accent); color: var(--color-on-accent); }
+  .btn-primary:hover:not(:disabled) { background: var(--color-accent-hover); }
+  .btn-ghost { background: transparent; border-color: transparent; box-shadow: none; color: var(--color-muted); }
+  .btn-ghost:hover:not(:disabled) { background: var(--color-raised); border-color: transparent; box-shadow: none; transform: none; color: var(--color-ink); }
+  .btn-ghost:active:not(:disabled) { transform: scale(0.96); }
+  .btn-danger { color: var(--color-danger); }
+  .btn-danger:hover:not(:disabled) { background: var(--color-danger-soft); color: var(--color-danger); }
+  .btn-sm { height: 2.1rem; padding-inline: 0.75rem; font-size: 0.84rem; gap: 0.35rem; }
+  .btn-icon { width: 2.4rem; height: 2.4rem; padding: 0; }
+  .btn-icon.btn-sm { width: 2.1rem; height: 2.1rem; }
+  .btn-lg { height: 3.4rem; padding-inline: 1.6rem; font-size: 1.05rem; border-radius: 999px; box-shadow: var(--shadow-card); }
+  .btn-lg:hover:not(:disabled) { box-shadow: var(--shadow-pop); transform: translate(-3px, -3px) rotate(-1deg); }
+
+  .chip {
+    display: inline-flex; align-items: center; gap: 0.3rem; white-space: nowrap;
+    height: 1.6rem; padding-inline: 0.6rem; border-radius: 999px;
+    font-size: 0.76rem; font-weight: 700;
+    background: var(--color-surface); color: var(--color-ink); border: 1.5px solid var(--color-edge);
+  }
+  .chip-accent { background: var(--color-accent-soft); color: var(--color-ink); }
+  .chip-success { background: var(--color-success-soft); color: var(--color-success); }
+  .chip-warning { background: var(--color-yellow); color: var(--color-ink); }
+  .chip-danger { background: var(--color-danger-soft); color: var(--color-danger); }
+
+  .label { display: block; margin-bottom: 0.4rem; font-size: 0.85rem; font-weight: 700; color: var(--color-ink); }
+  .form-control {
+    width: 100%; height: 2.75rem; padding: 0 0.85rem; font: inherit; font-size: 0.95rem; font-weight: 500;
+    color: var(--color-ink); background-color: var(--color-surface);
+    border: 2px solid var(--color-edge); border-radius: var(--radius-control);
+    transition: box-shadow 150ms var(--ease-spring), transform 150ms var(--ease-spring);
+  }
+  textarea.form-control { height: auto; padding: 0.65rem 0.85rem; resize: vertical; line-height: 1.55; }
+  .form-control:focus { outline: none; box-shadow: 4px 4px 0 var(--color-accent); transform: translate(-2px, -2px); }
+  .form-control::placeholder { color: var(--color-faint); }
+  .alert-error {
+    background: var(--color-danger-soft); color: var(--color-danger); border: 2px solid var(--color-danger);
+    border-radius: var(--radius-control); padding: 0.6rem 0.8rem; font-size: 0.9rem; font-weight: 700;
+  }
+
+  .nav-item {
+    position: relative; display: flex; align-items: center; gap: 0.7rem; width: 100%;
+    height: 2.6rem; padding-inline: 0.8rem; border-radius: var(--radius-control);
+    color: var(--color-ink); font-weight: 700; font-size: 0.95rem;
+    transition: transform 150ms var(--ease-spring);
+  }
+  .nav-item:hover { transform: translateX(3px); }
+
+  .seg { display: inline-flex; padding: 4px; gap: 2px; border-radius: 999px; background: var(--color-surface); border: 2px solid var(--color-edge); box-shadow: var(--shadow-sm); }
+  .seg-item {
+    position: relative; display: inline-flex; align-items: center; justify-content: center; gap: 0.35rem;
+    height: 2rem; padding-inline: 0.9rem; border-radius: 999px;
+    font-size: 0.85rem; font-weight: 700; color: var(--color-muted); white-space: nowrap;
+    transition: color 150ms ease;
+  }
+  .seg-item:hover, .seg-item[aria-current="page"], .seg-item[aria-pressed="true"] { color: var(--color-ink); }
+  .seg-pill { position: absolute; inset: 0; z-index: -1; border-radius: 999px; background: var(--color-yellow); border: 1.5px solid var(--color-edge); }
+
+  .skeleton {
+    border-radius: var(--radius-control);
+    background: linear-gradient(90deg, var(--color-raised) 25%, var(--color-line) 50%, var(--color-raised) 75%);
+    background-size: 200% 100%;
+    animation: var(--animate-shimmer);
+  }
+
+  .muted-link { color: var(--color-accent); font-weight: 700; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px; }
+  .muted-link:hover { background: var(--color-yellow); color: var(--color-ink); }
+
+  /* Rendered markdown inside notes */
+  .md > * + * { margin-top: 0.45rem; }
+  .md h1, .md h2, .md h3 { font-size: 1rem; font-weight: 800; color: var(--color-ink); }
+  .md ul { list-style: disc; padding-left: 1.2rem; }
+  .md ol { list-style: decimal; padding-left: 1.2rem; }
+  .md code { font-family: var(--font-mono); font-size: 0.85em; background: rgb(255 255 255 / 0.6); padding: 0.1em 0.35em; border-radius: 5px; }
+  .md pre { background: rgb(255 255 255 / 0.6); padding: 0.75rem; border-radius: var(--radius-control); overflow-x: auto; }
+  .md pre code { background: none; padding: 0; }
+  .md a { color: var(--color-accent); text-decoration: underline; text-underline-offset: 2px; }
+  .md blockquote { border-left: 3px solid var(--color-edge); padding-left: 0.75rem; }
+
+  .marquee-track { display: flex; width: max-content; animation: var(--animate-marquee); }
+  .marquee:hover .marquee-track { animation-play-state: paused; }
 }
 
-::-webkit-scrollbar-thumb {
-  background: #334155;
-  border-radius: 3px;
+/* Entrance animations run in CSS so they play on first paint, before hydration. */
+/* Headline word blocks: pop in with a springy overshoot, then wobble the other way on hover. */
+.pop {
+  display: inline-block; transform: rotate(var(--r, 0deg));
+  animation: pop-in 0.7s var(--ease-spring) both; animation-delay: calc(var(--i, 0) * 140ms + 100ms);
+  transition: transform 220ms var(--ease-spring);
 }
+.pop:hover { transform: rotate(calc(var(--r, 0deg) * -1)) scale(1.04); }
+.rise { animation: var(--animate-rise); animation-delay: calc(var(--i, 0) * 60ms); }
+.grow { transform-origin: bottom; animation: var(--animate-grow); animation-delay: calc(var(--i, 0) * 50ms + 150ms); }
+.wiggle { animation: var(--animate-wiggle); display: inline-block; }
+/* Resting shape matches the first keyframe, so the blob stays round when motion is reduced or paused. */
+.blob { border-radius: 58% 42% 46% 54% / 52% 44% 56% 48%; animation: var(--animate-blob); }
 
-::-webkit-scrollbar-thumb:hover {
-  background: #475569;
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    animation-delay: 0ms !important;
+    transition-duration: 0.01ms !important;
+  }
 }
