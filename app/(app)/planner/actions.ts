@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache'
 import { requireUser } from '@/utils/supabase/server'
 import { CATEGORIES } from '@/lib/categories'
+import { linkFields } from '@/utils/data'
 
 export type Result = { error?: string } | undefined
 
@@ -20,7 +21,7 @@ export async function addBlock(fd: FormData): Promise<Result> {
   if (!(CATEGORIES as readonly string[]).includes(color)) return { error: 'Pick a colour.' }
 
   const { supabase, uid } = await requireUser()
-  const { error } = await supabase.from('planner_blocks').insert({ user_id: uid, weekday, start_min, end_min, subject, color })
+  const { error } = await supabase.from('planner_blocks').insert({ user_id: uid, weekday, start_min, end_min, subject, color, ...linkFields(fd) })
   if (error) return { error: error.message }
   revalidatePath('/planner')
   revalidatePath('/dashboard')

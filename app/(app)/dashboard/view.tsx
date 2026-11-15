@@ -1,8 +1,8 @@
 import Link from 'next/link'
 import type { CSSProperties } from 'react'
 import { ArrowRightIcon, PlusIcon } from '@phosphor-icons/react/dist/ssr'
-import type { Task, Quote, Note, PlannerBlock } from '@/types/db'
-import { fmtMinutes, hhmm } from '@/lib/time'
+import type { Task, Quote, Note, PlannerBlock, Exam } from '@/types/db'
+import { fmtMinutes, hhmm, daysUntil } from '@/lib/time'
 import { CountUp } from '@/app/components/motion'
 import { CAT_TONE } from '@/lib/categories'
 import Greeting from './greeting'
@@ -30,10 +30,12 @@ export type DashboardData = {
   blocks: PlannerBlock[]
   quote: Quote | null
   notes: Note[]
+  nextExam: Exam | null
+  cardsDue: number
 }
 
 /** Pure view of the Today screen; page.tsx does the fetching. */
-export default function DashboardView({ name, focusToday, dueToday, open, streak, overdueCount, cgpa, week, today, blocks, quote, notes }: DashboardData) {
+export default function DashboardView({ name, focusToday, dueToday, open, streak, overdueCount, cgpa, week, today, blocks, quote, notes, nextExam, cardsDue }: DashboardData) {
   return (
     <div className="page">
       <header className="flex flex-wrap items-end justify-between gap-4 mb-8">
@@ -62,6 +64,22 @@ export default function DashboardView({ name, focusToday, dueToday, open, streak
             <span className="sticker size-14 text-3xl bg-surface" aria-hidden="true">🎓</span>
             <div><p className="font-bold">CGPA</p><p className="text-3xl font-extrabold tracking-tight">{cgpa === null ? <span className="text-lg">Not saved yet</span> : <CountUp value={cgpa} decimals={2} />}</p></div>
           </Link>
+          <div className="grid grid-cols-2 gap-6">
+            <Link href="/exams" className="card card-link bg-pink flex flex-col gap-1 rise" style={delay(4)}>
+              <p className="font-bold">Next exam</p>
+              {nextExam ? (
+                <>
+                  <p className="text-3xl font-extrabold tracking-tight" suppressHydrationWarning>{daysUntil(nextExam.exam_at) <= 0 ? 'Today' : `${daysUntil(nextExam.exam_at)}d`}</p>
+                  <p className="text-sm font-bold truncate">{nextExam.title}</p>
+                </>
+              ) : <p className="text-lg font-extrabold">None set</p>}
+            </Link>
+            <Link href="/flashcards" className={`card card-link flex flex-col gap-1 rise ${cardsDue ? 'bg-yellow' : 'bg-surface'}`} style={delay(4)}>
+              <p className="font-bold">Cards due</p>
+              <p className="text-3xl font-extrabold tracking-tight"><CountUp value={cardsDue} /></p>
+              <p className="text-sm font-bold">{cardsDue ? 'Review now' : 'All caught up'}</p>
+            </Link>
+          </div>
         </div>
 
         <section className="card md:col-span-2 xl:col-span-7 rise" style={delay(5)} aria-labelledby="up-next">

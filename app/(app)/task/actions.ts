@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache'
 import { requireUser } from '@/utils/supabase/server'
+import { linkFields } from '@/utils/data'
 
 export type Result = { error?: string } | undefined
 
@@ -22,6 +23,7 @@ function parse(fd: FormData) {
       description: text(fd, 'description') || null,
       due_date,
       priority: PRIORITIES.includes(priority) ? priority : 'medium',
+      ...linkFields(fd),
     },
   }
 }
@@ -34,6 +36,7 @@ async function run(
   if (error) return { error: error.message }
   revalidatePath('/task')
   revalidatePath('/dashboard')
+  revalidatePath('/subjects', 'layout')
 }
 
 export async function addTask(fd: FormData): Promise<Result> {

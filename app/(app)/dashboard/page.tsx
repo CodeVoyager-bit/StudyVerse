@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/utils/supabase/server'
-import type { Task, Quote, Note, PomodoroSession, PlannerBlock, GpaProfile } from '@/types/db'
+import type { Task, Quote, Note, PomodoroSession, PlannerBlock, GpaProfile, Exam } from '@/types/db'
 import { nowIso, dayNumber, daysAgoIso, utcWeekday, startOfUtcDayIso, endOfUtcDayIso, startOfUtcWeekIso } from '@/lib/time'
 import { streakDays } from '@/lib/streak.mjs'
 import { gpa } from '@/lib/gpa.mjs'
@@ -20,7 +20,7 @@ export default async function DashboardPage() {
   const name = meta.username || meta.full_name?.split(' ')[0] || meta.name?.split(' ')[0] || user.email?.split('@')[0] || 'there'
   const today = utcWeekday()
 
-  const [open, overdue, dueToday, quotes, sessions, blocks, notes, profile] = await Promise.all([
+  const [open, overdue, dueToday, quotes, sessions, blocks, notes, profile, exams, cardsDue] = await Promise.all([
     rows<Task>(supabase.from('tasks').select('*').eq('user_id', uid).eq('completed', false).order('due_date', { ascending: true, nullsFirst: false }).limit(6)),
     supabase.from('tasks').select('id', { count: 'exact', head: true }).eq('user_id', uid).eq('completed', false).lt('due_date', nowIso()),
     rows<Pick<Task, 'completed'>>(supabase.from('tasks').select('completed').eq('user_id', uid).gte('due_date', startOfUtcDayIso()).lt('due_date', endOfUtcDayIso())),
@@ -29,6 +29,8 @@ export default async function DashboardPage() {
     rows<PlannerBlock>(supabase.from('planner_blocks').select('*').eq('user_id', uid).eq('weekday', today).order('start_min')),
     rows<Note>(supabase.from('notes').select('*').eq('user_id', uid).order('updated_at', { ascending: false }).limit(3)),
     supabase.from('gpa_profiles').select('*').eq('user_id', uid).maybeSingle(),
+    rows<Exam>(supabase.from('exams').select('*').eq('user_id', uid).gte('exam_at', nowIso()).order('exam_at').limit(1)),
+    supabase.from('flashcards').select('id', { count: 'exact', head: true }).eq('user_id', uid).lte('due_at', nowIso()),
   ])
 
   const dayStart = startOfUtcDayIso()
@@ -51,6 +53,8 @@ export default async function DashboardPage() {
       blocks={blocks}
       quote={quotes.length ? quotes[dayNumber() % quotes.length] : null}
       notes={notes}
+      nextExam={exams[0] ?? null}
+      cardsDue={cardsDue.count ?? 0}
     />
   )
 }

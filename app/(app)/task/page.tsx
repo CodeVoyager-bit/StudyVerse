@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/utils/supabase/server'
+import { getSubjects, getMyResources } from '@/utils/data'
 import type { Task } from '@/types/db'
 import { nowIso, inHoursIso } from '@/lib/time'
 import { Segmented } from '@/app/components/motion'
@@ -32,6 +33,7 @@ export default async function TasksPage({ searchParams }: { searchParams: Promis
     .order('created_at', { ascending: false })
   if (error) throw new Error(error.message)
   const tasks = (data ?? []) as Task[]
+  const [subjects, resources] = await Promise.all([getSubjects(supabase, user.id), getMyResources(supabase, user.id)])
   const open = tasks.filter((t) => !t.completed).length
 
   return (
@@ -48,7 +50,7 @@ export default async function TasksPage({ searchParams }: { searchParams: Promis
           items={FILTERS.map((f) => ({ key: f.key, label: f.label, href: f.key === 'all' ? '/task' : `/task?filter=${f.key}` }))}
         />
       </header>
-      <TaskList key={filter.key} tasks={tasks} emptyText={filter.empty} />
+      <TaskList key={filter.key} tasks={tasks} emptyText={filter.empty} links={{ subjects, resources }} />
     </div>
   )
 }

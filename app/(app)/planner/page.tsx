@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/utils/supabase/server'
+import { getSubjects, getMyResources } from '@/utils/data'
 import type { PlannerBlock } from '@/types/db'
 import WeekGrid from './week-grid'
 
@@ -13,6 +14,7 @@ export default async function PlannerPage() {
   const { data, error } = await supabase.from('planner_blocks').select('*').eq('user_id', user.id).order('start_min')
   if (error) throw new Error(`${error.message}. Run supabase/migrations/0002_v2.sql first.`)
   const blocks = (data ?? []) as PlannerBlock[]
+  const [subjects, resources] = await Promise.all([getSubjects(supabase, user.id), getMyResources(supabase, user.id)])
   const hours = blocks.reduce((sum, b) => sum + (b.end_min - b.start_min), 0) / 60
 
   return (
@@ -21,7 +23,7 @@ export default async function PlannerPage() {
         <h1 className="page-title">Your <span className="hl" style={{ '--hl': 'var(--color-sky)' } as React.CSSProperties}>week</span></h1>
         <p className="page-sub">{blocks.length ? `${hours % 1 ? hours.toFixed(1) : hours} hours of study planned this week` : 'Block out your study week.'}</p>
       </header>
-      <WeekGrid blocks={blocks} />
+      <WeekGrid blocks={blocks} subjects={subjects} resources={resources} />
     </div>
   )
 }

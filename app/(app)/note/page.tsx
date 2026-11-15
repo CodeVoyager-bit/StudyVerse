@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { MagnifyingGlassIcon, XIcon } from '@phosphor-icons/react/dist/ssr'
 import { createClient } from '@/utils/supabase/server'
+import { getSubjects } from '@/utils/data'
 import type { Note } from '@/types/db'
 import NoteList from './note-list'
 
@@ -26,6 +27,7 @@ export default async function NotesPage({ searchParams }: { searchParams: Promis
   if (error) throw new Error(error.message)
   const allTags = [...new Set(((tagRows.data ?? []) as { tags: string[] | null }[]).flatMap((r) => r.tags ?? []))].sort()
   const notes = (data ?? []) as Note[]
+  const subjects = await getSubjects(supabase, user.id)
 
   return (
     <div className="page">
@@ -51,7 +53,7 @@ export default async function NotesPage({ searchParams }: { searchParams: Promis
         </nav>
       )}
 
-      <NoteList key={`${q}|${tag}`} notes={notes} filtered={!!(q || tag)} />
+      <NoteList key={`${q}|${tag}`} notes={notes} filtered={!!(q || tag)} subjects={subjects} />
     </div>
   )
 }

@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache'
 import { requireUser } from '@/utils/supabase/server'
+import { linkFields } from '@/utils/data'
 
 export type Result = { error?: string } | undefined
 
@@ -10,7 +11,8 @@ const tags = (fd: FormData) =>
   [...new Set(text(fd, 'tags').split(',').map((t) => t.trim().toLowerCase()).filter(Boolean))].slice(0, 10)
 
 function parse(fd: FormData) {
-  const fields = { title: text(fd, 'title'), content: text(fd, 'content'), tags: tags(fd) }
+  const { subject_id } = linkFields(fd)
+  const fields = { title: text(fd, 'title'), content: text(fd, 'content'), tags: tags(fd), ...(subject_id !== undefined && { subject_id }) }
   if (!fields.title || !fields.content) return { error: 'Title and content are required.' }
   return { fields }
 }
@@ -22,6 +24,7 @@ async function run(
   if (error) return { error: error.message }
   revalidatePath('/note')
   revalidatePath('/dashboard')
+  revalidatePath('/subjects', 'layout')
 }
 
 export async function addNote(fd: FormData): Promise<Result> {

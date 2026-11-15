@@ -2,10 +2,12 @@
 
 import { useOptimistic, useState, useTransition } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
-import { PencilSimpleIcon, TrashIcon, PlusIcon, ClockIcon, FlagIcon } from '@phosphor-icons/react/dist/ssr'
+import { PencilSimpleIcon, TrashIcon, PlusIcon, ClockIcon, FlagIcon, PlayCircleIcon } from '@phosphor-icons/react/dist/ssr'
 import CheckButton from '@/app/components/CheckButton'
-import type { Task, Priority } from '@/types/db'
+import type { Task, Priority, Subject, Resource } from '@/types/db'
 import SubmitButton from '@/app/components/SubmitButton'
+import SubjectSelect from '@/app/components/SubjectSelect'
+import { CAT_TONE } from '@/lib/categories'
 import { SPRING } from '@/app/components/motion'
 import { isPast } from '@/lib/time'
 import { addTask, updateTask, toggleTask, deleteTask, type Result } from './actions'
@@ -23,15 +25,22 @@ const toLocalInput = (iso: string | null | undefined) =>
   iso ? new Date(new Date(iso).getTime() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16) : ''
 const fmtDue = (iso: string) => new Date(iso).toLocaleString(undefined, { day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' })
 
-export function TaskRow({ task, onToggle, onEdit, onDelete, compact = false }: {
+/** The user's subjects and library, for the optional pickers and the chips on each task. */
+export type Links = { subjects: Subject[]; resources: Resource[] }
+const NO_LINKS: Links = { subjects: [], resources: [] }
+
+export function TaskRow({ task, onToggle, onEdit, onDelete, compact = false, links = NO_LINKS }: {
   task: Task
   onToggle: () => void
   onEdit?: () => void
   onDelete?: () => void
   compact?: boolean
+  links?: Links
 }) {
   const overdue = !task.completed && isPast(task.due_date)
   const p = PRIORITY[task.priority ?? 'medium']
+  const subject = links.subjects.find((s) => s.id === task.subject_id)
+  const resource = links.resources.find((r) => r.id === task.resource_id)
   return (
     <div className="group flex items-start gap-3 py-3">
       <CheckButton done={task.completed} onToggle={onToggle} title={task.title} />
@@ -46,6 +55,12 @@ export function TaskRow({ task, onToggle, onEdit, onDelete, compact = false }: {
               </span>
             )}
             {!compact && <span className={p.chip}><FlagIcon size={12} weight="fill" aria-hidden="true" />{p.label}</span>}
+            {subject && <span className={`chip ${CAT_TONE[subject.color] ?? ''}`}>{subject.name}</span>}
+            {resource && (
+              <a href={resource.url} target="_blank" rel="noopener noreferrer" className="chip hover:bg-yellow max-w-[16rem]">
+                <PlayCircleIcon size={13} weight="fill" aria-hidden="true" /><span className="truncate">{resource.title}</span>
+              </a>
+            )}
           </div>
         )}
       </div>
@@ -60,7 +75,7 @@ export function TaskRow({ task, onToggle, onEdit, onDelete, compact = false }: {
   )
 }
 
-function TaskForm({ task, action, onDone, autoFocus }: { task?: Task; action: Action; onDone: () => void; autoFocus?: boolean }) {
+function TaskForm({ task, action, onDone, autoFocus, links }: { task?: Task; action: Action; onDone: () => void; autoFocus?: boolean; links: Links }) {
   const [error, setError] = useState('')
   const id = task?.id ?? 'new'
 
@@ -97,6 +112,16 @@ function TaskForm({ task, action, onDone, autoFocus }: { task?: Task; action: Ac
             <option value="high">High</option>
           </select>
         </div>
+        {links.subjects.length > 0 && <SubjectSelect subjects={links.subjects} id={`subj-${id}`} defaultValue={task?.subject_id} />}
+        {links.resources.length > 0 && (
+          <div>
+            <label htmlFor={`res-${id}`} className="label">Watch or read <span className="font-normal text-faint">(optional)</span></label>
+            <select id={`res-${id}`} name="resource_id" defaultValue={task?.resource_id ?? ''} className="form-control">
+              <option value="">Nothing from the library</option>
+              {links.resources.map((r) => <option key={r.id} value={r.id}>{r.title}</option>)}
+            </select>
+          </div>
+        )}
       </div>
       <div className="flex justify-end gap-3 pt-1">
         <button type="button" className="btn btn-ghost" onClick={onDone}>Cancel</button>
@@ -129,7 +154,7 @@ export function useTaskMutations(tasks: Task[]) {
   return { items, toggle, remove }
 }
 
-export default function TaskList({ tasks, emptyText }: { tasks: Task[]; emptyText: string }) {
+export default function TaskList({ tasks, emptyText, links = NO_LINKS }: { tasks: Task[]; emptyText: string; links?: Links }) {
   const { items, toggle, remove } = useTaskMutations(tasks)
   const [editing, setEditing] = useState<string | null>(null)
   const [composing, setComposing] = useState(false)
@@ -138,7 +163,7 @@ export default function TaskList({ tasks, emptyText }: { tasks: Task[]; emptyTex
   return (
     <div className="flex flex-col gap-4">
       {composing ? (
-        <div className="card py-1"><TaskForm action={addTask} onDone={() => setComposing(false)} autoFocus /></div>
+        <div className="card py-1"><TaskForm action={addTask} onDone={() => setComposing(false)} autoFocus links={links} /></div>
       ) : (
         <button type="button" onClick={() => setComposing(true)} className="card card-link flex items-center gap-3 text-left font-bold py-3.5">
           <span className="grid place-items-center size-8 rounded-full bg-yellow border-2 border-ink"><PlusIcon size={16} weight="bold" aria-hidden="true" /></span>
@@ -165,9 +190,9 @@ export default function TaskList({ tasks, emptyText }: { tasks: Task[]; emptyTex
                 transition={SPRING}
               >
                 {editing === t.id ? (
-                  <TaskForm task={t} action={updateTask.bind(null, t.id)} onDone={() => setEditing(null)} />
+                  <TaskForm task={t} action={updateTask.bind(null, t.id)} onDone={() => setEditing(null)} links={links} />
                 ) : (
-                  <TaskRow task={t} onToggle={() => toggle(t)} onEdit={() => setEditing(t.id)} onDelete={() => remove(t)} />
+                  <TaskRow task={t} onToggle={() => toggle(t)} onEdit={() => setEditing(t.id)} onDelete={() => remove(t)} links={links} />
                 )}
               </motion.li>
             ))}

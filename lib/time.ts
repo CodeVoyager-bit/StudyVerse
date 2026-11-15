@@ -28,3 +28,9 @@ export const startOfUtcWeekIso = () => utcMidnight(-utcWeekday()).toISOString()
 
 export const fmtMinutes = (m: number) => (m < 60 ? `${m}m` : m % 60 ? `${Math.floor(m / 60)}h ${m % 60}m` : `${m / 60}h`)
 export const hhmm = (min: number) => `${String(Math.floor(min / 60)).padStart(2, '0')}:${String(min % 60).padStart(2, '0')}`
+/** Whole days from now until `iso` (0 = later today, negative = past), in the viewer's local calendar. */
+export const daysUntil = (iso: string) => {
+  const d = new Date(iso)
+  const today = new Date()
+  return Math.round((new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime() - new Date(today.getFullYear(), today.getMonth(), today.getDate()).getTime()) / 86_400_000)
+}

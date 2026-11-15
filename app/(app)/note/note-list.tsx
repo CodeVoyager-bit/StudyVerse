@@ -5,8 +5,9 @@ import Link from 'next/link'
 import ReactMarkdown from 'react-markdown'
 import { AnimatePresence, motion } from 'motion/react'
 import { PencilSimpleIcon, TrashIcon, PlusIcon, EyeIcon, PencilLineIcon } from '@phosphor-icons/react/dist/ssr'
-import type { Note } from '@/types/db'
+import type { Note, Subject } from '@/types/db'
 import SubmitButton from '@/app/components/SubmitButton'
+import SubjectSelect from '@/app/components/SubjectSelect'
 import { SPRING } from '@/app/components/motion'
 import { addNote, updateNote, deleteNote, type Result } from './actions'
 
@@ -18,7 +19,7 @@ const TAPE = ['var(--color-sky)', 'var(--color-yellow)', 'var(--color-pink)', 'v
 const TILT = ['-2deg', '1.5deg', '-1deg', '2deg', '0.5deg']
 const hash = (id: string) => [...id].reduce((a, c) => (a * 31 + c.charCodeAt(0)) >>> 0, 7)
 
-function NoteForm({ note, action, onDone }: { note?: Note; action: Action; onDone: () => void }) {
+function NoteForm({ note, action, onDone, subjects }: { note?: Note; action: Action; onDone: () => void; subjects: Subject[] }) {
   const [error, setError] = useState('')
   const [content, setContent] = useState(note?.content ?? '')
   const [preview, setPreview] = useState(false)
@@ -52,9 +53,12 @@ function NoteForm({ note, action, onDone }: { note?: Note; action: Action; onDon
           <textarea id={`content-${id}`} name="content" placeholder="Write it down while it's fresh…" value={content} onChange={(e) => setContent(e.target.value)} className="form-control" rows={6} required />
         )}
       </div>
-      <div>
-        <label htmlFor={`tags-${id}`} className="label">Tags <span className="font-normal text-faint">(comma separated)</span></label>
-        <input id={`tags-${id}`} name="tags" type="text" placeholder="dbms, unit 2…" defaultValue={note?.tags?.join(', ')} className="form-control" autoComplete="off" />
+      <div className={`grid gap-3 ${subjects.length ? 'sm:grid-cols-2' : ''}`}>
+        <div>
+          <label htmlFor={`tags-${id}`} className="label">Tags <span className="font-normal text-faint">(comma separated)</span></label>
+          <input id={`tags-${id}`} name="tags" type="text" placeholder="dbms, unit 2…" defaultValue={note?.tags?.join(', ')} className="form-control" autoComplete="off" />
+        </div>
+        {subjects.length > 0 && <SubjectSelect subjects={subjects} id={`subj-${id}`} defaultValue={note?.subject_id} />}
       </div>
       <div className="flex justify-end gap-2 pt-1">
         <button type="button" className="btn btn-ghost" onClick={onDone}>Cancel</button>
@@ -64,9 +68,10 @@ function NoteForm({ note, action, onDone }: { note?: Note; action: Action; onDon
   )
 }
 
-function NoteCard({ note, onDelete }: { note: Note; onDelete: () => void }) {
+function NoteCard({ note, onDelete, subjects, tools }: { note: Note; onDelete: () => void; subjects: Subject[]; tools?: React.ReactNode }) {
   const [editing, setEditing] = useState(false)
-  if (editing) return <div className="card"><NoteForm note={note} action={updateNote.bind(null, note.id)} onDone={() => setEditing(false)} /></div>
+  if (editing) return <div className="card"><NoteForm note={note} action={updateNote.bind(null, note.id)} onDone={() => setEditing(false)} subjects={subjects} /></div>
+  const subject = subjects.find((s) => s.id === note.subject_id)
 
   const h = hash(note.id)
   return (
@@ -78,11 +83,13 @@ function NoteCard({ note, onDelete }: { note: Note; onDelete: () => void }) {
       <div className="md text-[0.92rem] font-medium max-h-56 overflow-hidden break-words [mask-image:linear-gradient(to_bottom,black_75%,transparent)]">
         <ReactMarkdown>{note.content}</ReactMarkdown>
       </div>
-      {note.tags?.length > 0 && (
+      {(note.tags?.length > 0 || subject) && (
         <div className="flex flex-wrap gap-1.5">
-          {note.tags.map((t) => <Link key={t} href={`/note?tag=${encodeURIComponent(t)}`} className="chip hover:bg-ink hover:text-surface transition-colors">#{t}</Link>)}
+          {subject && <Link href={`/subjects/${subject.id}`} className="chip bg-surface hover:bg-ink hover:text-surface transition-colors">{subject.name}</Link>}
+          {note.tags?.map((t) => <Link key={t} href={`/note?tag=${encodeURIComponent(t)}`} className="chip hover:bg-ink hover:text-surface transition-colors">#{t}</Link>)}
         </div>
       )}
+      {tools}
       <div className="flex items-center justify-between pt-2 border-t-2 border-dashed border-ink/25">
         <p className="text-xs font-bold" suppressHydrationWarning>{new Date(note.updated_at).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })}</p>
         <div className="flex gap-1 transition-opacity lg:opacity-0 lg:group-hover:opacity-100 lg:group-focus-within:opacity-100">
@@ -94,7 +101,13 @@ function NoteCard({ note, onDelete }: { note: Note; onDelete: () => void }) {
   )
 }
 
-export default function NoteList({ notes, filtered }: { notes: Note[]; filtered: boolean }) {
+export default function NoteList({ notes, filtered, subjects = [], tools }: {
+  notes: Note[]
+  filtered: boolean
+  subjects?: Subject[]
+  /** Extra controls per note (the AI helpers), rendered on each card. */
+  tools?: (note: Note) => React.ReactNode
+}) {
   const [items, removeOptimistic] = useOptimistic(notes, (state, id: string) => state.filter((n) => n.id !== id))
   const [, startTransition] = useTransition()
   const [composing, setComposing] = useState(false)
@@ -110,7 +123,7 @@ export default function NoteList({ notes, filtered }: { notes: Note[]; filtered:
   return (
     <div className="flex flex-col gap-5">
       {composing ? (
-        <div className="card max-w-[680px]"><NoteForm action={addNote} onDone={() => setComposing(false)} /></div>
+        <div className="card max-w-[680px]"><NoteForm action={addNote} onDone={() => setComposing(false)} subjects={subjects} /></div>
       ) : (
         <button type="button" onClick={() => setComposing(true)} className="card card-link flex items-center gap-3 text-left font-bold py-3.5 max-w-[680px]">
           <span className="grid place-items-center size-8 rounded-full bg-pink border-2 border-ink"><PlusIcon size={16} weight="bold" aria-hidden="true" /></span>
@@ -136,7 +149,7 @@ export default function NoteList({ notes, filtered }: { notes: Note[]; filtered:
                 exit={{ opacity: 0, scale: 0.95, transition: { duration: 0.15 } }}
                 transition={SPRING}
               >
-                <NoteCard note={note} onDelete={() => remove(note)} />
+                <NoteCard note={note} onDelete={() => remove(note)} subjects={subjects} tools={tools?.(note)} />
               </motion.div>
             ))}
           </AnimatePresence>
