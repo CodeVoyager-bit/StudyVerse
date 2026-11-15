@@ -1,6 +1,7 @@
 'use client'
 
 import { useOptimistic, useState, useTransition } from 'react'
+import { useFeedback } from '@/app/components/Feedback'
 import Link from 'next/link'
 import ReactMarkdown from 'react-markdown'
 import { AnimatePresence, motion } from 'motion/react'
@@ -112,9 +113,10 @@ export default function NoteList({ notes, filtered, subjects = [], ai = false }:
   const [items, removeOptimistic] = useOptimistic(notes, (state, id: string) => state.filter((n) => n.id !== id))
   const [, startTransition] = useTransition()
   const [composing, setComposing] = useState(false)
+  const { confirm } = useFeedback()
 
-  const remove = (n: Note) => {
-    if (!confirm(`Delete "${n.title}"? This can't be undone.`)) return
+  const remove = async (n: Note) => {
+    if (!(await confirm({ title: `Delete "${n.title}"?`, body: 'This can’t be undone.', confirmLabel: 'Delete', danger: true }))) return
     startTransition(async () => {
       removeOptimistic(n.id)
       await deleteNote(n.id)

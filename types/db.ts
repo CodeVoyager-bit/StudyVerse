@@ -126,6 +126,8 @@ export type StudyGroup = {
   invite_code: string
   call_room: string
   weekly_goal_minutes: number
+  next_session_at?: string | null
+  session_weekly?: boolean
   created_at: string
 }
 
@@ -157,5 +159,6 @@ export type GroupSession = {
   ends_at: string | null
   paused_seconds: number | null
   started_by: string | null
+  call_url?: string | null
   updated_at: string
 }

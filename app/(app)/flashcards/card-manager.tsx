@@ -1,6 +1,7 @@
 'use client'
 
 import { useRef, useState, useTransition } from 'react'
+import { useFeedback } from '@/app/components/Feedback'
 import { PlusIcon, TrashIcon } from '@phosphor-icons/react/dist/ssr'
 import type { Flashcard, Subject } from '@/types/db'
 import SubmitButton from '@/app/components/SubmitButton'
@@ -21,7 +22,8 @@ export default function CardManager({ cards, subjects }: { cards: Flashcard[]; s
     form.current?.reset()
     form.current?.querySelector<HTMLTextAreaElement>('textarea')?.focus()
   }
-  const remove = (c: Flashcard) => confirm('Delete this card?') && startTransition(async () => { await deleteCard(c.id) })
+  const { confirm } = useFeedback()
+  const remove = async (c: Flashcard) => (await confirm({ title: 'Delete this card?', body: c.front, confirmLabel: 'Delete', danger: true })) && startTransition(async () => { await deleteCard(c.id) })
 
   return (
     <div className="flex flex-col gap-5">

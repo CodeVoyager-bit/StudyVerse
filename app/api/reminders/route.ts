@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { createAdminClient } from '@/utils/supabase/admin'
 import { pushConfigured, sendPush, type PushRow } from '@/utils/push'
 import { reminderText } from '@/lib/push.mjs'
+import { nextSession } from '@/lib/schedule.mjs'
 
 // Daily push (vercel.json cron): exams in the next 3 days, tasks due in the next 24 hours, flashcards due.
 // Unlike keep-alive this sends notifications, so it refuses to run without CRON_SECRET.
@@ -19,11 +20,22 @@ export async function GET(request: Request) {
   const now = Date.now()
   const iso = (ms: number) => new Date(ms).toISOString()
   // ponytail: one query per table for everyone; page these once there are thousands of subscribers.
-  const [tasks, exams, cards] = await Promise.all([
+  const [tasks, exams, cards, groups] = await Promise.all([
     admin.from('tasks').select('user_id').in('user_id', users).eq('completed', false).gte('due_date', iso(now)).lt('due_date', iso(now + 86_400_000)),
     admin.from('exams').select('user_id, title, exam_at').in('user_id', users).gte('exam_at', iso(now)).lt('exam_at', iso(now + 3 * 86_400_000)).order('exam_at'),
     admin.from('flashcards').select('user_id').in('user_id', users).lte('due_at', iso(now)),
+    // Errors (e.g. before migration 0004) just mean no session lines.
+    admin.from('group_members').select('user_id, study_groups(name, next_session_at, session_weekly)').in('user_id', users),
   ])
+  type GroupRow = { user_id: string; study_groups: { name: string; next_session_at: string | null; session_weekly: boolean } | null }
+  const sessionsFor = (uid: string) =>
+    ((groups.data ?? []) as unknown as GroupRow[])
+      .filter((g) => g.user_id === uid && g.study_groups)
+      .flatMap((g) => {
+        const at = nextSession(g.study_groups!.next_session_at, g.study_groups!.session_weekly, now)
+        const hours = at ? (Date.parse(at) - now) / 3_600_000 : -1
+        return hours >= 0 && hours <= 24 ? [{ name: g.study_groups!.name, hours }] : []
+      })
 
   let sent = 0
   const gone: string[] = []
@@ -32,6 +44,7 @@ export async function GET(request: Request) {
       dueTasks: (tasks.data ?? []).filter((t) => t.user_id === uid).length,
       exams: (exams.data ?? []).filter((e) => e.user_id === uid).map((e) => ({ title: e.title, days: Math.floor((Date.parse(e.exam_at) - now) / 86_400_000) })),
       cardsDue: (cards.data ?? []).filter((c) => c.user_id === uid).length,
+      sessions: sessionsFor(uid),
     })
     if (!msg) continue
     const r = await sendPush((subs as PushRow[]).filter((s) => s.user_id === uid), { ...msg, tag: 'daily' })

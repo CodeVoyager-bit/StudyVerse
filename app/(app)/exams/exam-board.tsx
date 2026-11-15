@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useTransition } from 'react'
+import { useFeedback } from '@/app/components/Feedback'
 import { PlusIcon, TrashIcon, MapPinIcon, CalendarPlusIcon } from '@phosphor-icons/react/dist/ssr'
 import type { Exam, Subject } from '@/types/db'
 import SubmitButton from '@/app/components/SubmitButton'
@@ -23,7 +24,8 @@ export default function ExamBoard({ exams, subjects }: { exams: Exam[]; subjects
     const res = await addExam(fd)
     setError(res?.error ?? '')
   }
-  const remove = (e: Exam) => confirm(`Delete "${e.title}"?`) && startTransition(async () => { await deleteExam(e.id) })
+  const { confirm } = useFeedback()
+  const remove = async (e: Exam) => (await confirm({ title: `Delete "${e.title}"?`, confirmLabel: 'Delete', danger: true })) && startTransition(async () => { await deleteExam(e.id) })
 
   return (
     <div className="flex flex-col gap-6">

@@ -3,6 +3,8 @@
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { requireUser } from '@/utils/supabase/server'
+import { createAdminClient } from '@/utils/supabase/admin'
+import { pushConfigured, sendPush, type PushRow } from '@/utils/push'
 
 export type Result = { error?: string } | undefined
 const text = (fd: FormData, key: string) => String(fd.get(key) ?? '').trim()
@@ -60,23 +62,70 @@ export async function deleteGroup(groupId: string): Promise<Result> {
 export async function removeMember(groupId: string, userId: string): Promise<Result> {
   const { supabase, uid } = await requireUser()
   if (userId === uid) return { error: 'Owners delete the group instead of leaving it.' }
-  const { error } = await supabase.from('group_members').delete().eq('group_id', groupId).eq('user_id', userId)
+  // RLS lets only the owner delete someone else's row; zero rows back means this user isn't the owner.
+  const { data, error } = await supabase.from('group_members').delete().eq('group_id', groupId).eq('user_id', userId).select('user_id')
   if (error) return { error: error.message }
+  if (!data?.length) return { error: 'Only the group owner can remove members.' }
   revalidatePath(`/groups/${groupId}`)
 }
 
 export async function updateGroup(groupId: string, fd: FormData): Promise<Result> {
   const groupName = text(fd, 'name')
   const goalHours = Number(text(fd, 'goal_hours'))
+  const next = text(fd, 'next_session_at')
   if (!groupName || groupName.length > 60) return { error: 'The name needs 1 to 60 characters.' }
   if (!(goalHours >= 1 && goalHours <= 160)) return { error: 'Set a weekly goal between 1 and 160 hours.' }
+  if (next && Number.isNaN(Date.parse(next))) return { error: 'Pick a date and time for the next session.' }
   const { supabase, uid } = await requireUser()
   const { error } = await supabase
     .from('study_groups')
-    .update({ name: groupName, description: text(fd, 'description').slice(0, 280) || null, weekly_goal_minutes: Math.round(goalHours * 60) })
+    .update({
+      name: groupName,
+      description: text(fd, 'description').slice(0, 280) || null,
+      weekly_goal_minutes: Math.round(goalHours * 60),
+      next_session_at: next || null,
+      session_weekly: !!next && fd.get('session_weekly') === 'on',
+    })
     .eq('id', groupId)
     .eq('owner_id', uid)
   if (error) return { error: error.message }
   revalidatePath(`/groups/${groupId}`)
   revalidatePath('/groups')
+}
+
+const NUDGE_EVERY_MS = 15 * 60_000
+const AWAY_MS = 70_000
+
+/**
+ * "Focus is starting" push to members who aren't in the room and have reminders on.
+ * At most one per group every 15 minutes; the server stamps nudged_at, which members can't write.
+ */
+export async function nudgeGroup(groupId: string, minutes: number): Promise<{ sent?: number }> {
+  const { supabase, uid } = await requireUser()
+  const { data: group } = await supabase.from('study_groups').select('name').eq('id', groupId).maybeSingle()
+  const admin = createAdminClient()
+  if (!group || !admin || !pushConfigured()) return {}
+
+  const now = Date.now()
+  const { data: claimed } = await admin
+    .from('group_sessions')
+    .update({ nudged_at: new Date(now).toISOString() })
+    .eq('group_id', groupId)
+    .or(`nudged_at.is.null,nudged_at.lt.${new Date(now - NUDGE_EVERY_MS).toISOString()}`)
+    .select('group_id')
+  if (!claimed?.length) return {}
+
+  const { data: members } = await admin.from('group_members').select('user_id, display_name, last_seen').eq('group_id', groupId)
+  const me = members?.find((m) => m.user_id === uid)
+  const away = (members ?? []).filter((m) => m.user_id !== uid && (!m.last_seen || now - Date.parse(m.last_seen) > AWAY_MS)).map((m) => m.user_id)
+  if (!away.length) return { sent: 0 }
+  const { data: subs } = await admin.from('push_subscriptions').select('endpoint, p256dh, auth, user_id').in('user_id', away)
+  const r = await sendPush((subs ?? []) as PushRow[], {
+    title: group.name,
+    body: `${me?.display_name ?? 'Someone'} started a ${Math.round(minutes)} min group focus. Join in.`,
+    url: `/groups/${groupId}`,
+    tag: `group-${groupId}`,
+  })
+  if (r.gone.length) await admin.from('push_subscriptions').delete().in('endpoint', r.gone)
+  return { sent: r.sent }
 }

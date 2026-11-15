@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useSyncExternalStore } from 'react'
+import { useFeedback } from '@/app/components/Feedback'
 import { PlusIcon, CalendarDotsIcon, PlayCircleIcon } from '@phosphor-icons/react/dist/ssr'
 import type { PlannerBlock, Subject, Resource } from '@/types/db'
 import SubmitButton from '@/app/components/SubmitButton'
@@ -42,8 +43,9 @@ export default function WeekGrid({ blocks, subjects = [], resources = [] }: { bl
     const res = await addBlock(fd)
     setError(res?.error ?? '')
   }
-  const remove = (b: PlannerBlock) => {
-    if (confirm(`Remove "${b.subject}" (${hhmm(b.start_min)}-${hhmm(b.end_min)})?`)) deleteBlock(b.id)
+  const { confirm } = useFeedback()
+  const remove = async (b: PlannerBlock) => {
+    if (await confirm({ title: `Remove "${b.subject}"?`, body: `${DAYS_LONG[b.weekday]}, ${hhmm(b.start_min)} to ${hhmm(b.end_min)}`, confirmLabel: 'Remove', danger: true })) deleteBlock(b.id)
   }
 
   return (

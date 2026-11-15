@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useTransition } from 'react'
+import { useFeedback } from '@/app/components/Feedback'
 import Image from 'next/image'
 import { PlayIcon, ArrowSquareOutIcon, TrashIcon, FilePdfIcon, LinkSimpleIcon, XIcon } from '@phosphor-icons/react/dist/ssr'
 import type { Resource, Subject } from '@/types/db'
@@ -25,8 +26,9 @@ export default function ResourceCard({ resource, subject, canEdit, extra }: {
     setLocalWatched(!watched)
     startTransition(async () => { await setWatched(resource.id, !watched) })
   }
-  const remove = () => {
-    if (!confirm(`Remove "${resource.title}" from the library?`)) return
+  const { confirm } = useFeedback()
+  const remove = async () => {
+    if (!(await confirm({ title: `Remove "${resource.title}"?`, body: resource.group_id ? 'It disappears from the group’s shared library.' : 'It leaves your library.', confirmLabel: 'Remove', danger: true }))) return
     startTransition(async () => { await deleteResource(resource.id, resource.group_id) })
   }
 

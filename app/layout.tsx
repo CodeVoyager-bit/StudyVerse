@@ -3,6 +3,7 @@ import type { ReactNode } from 'react'
 import { Bricolage_Grotesque, Caveat, Space_Mono } from 'next/font/google'
 import { MotionProvider } from './components/motion'
 import ServiceWorker from './components/ServiceWorker'
+import { FeedbackProvider } from './components/Feedback'
 import './globals.css'
 
 const bricolage = Bricolage_Grotesque({ subsets: ['latin'], variable: '--font-bricolage', axes: ['opsz', 'wdth'] })
@@ -22,7 +23,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     <html lang="en" className={`${bricolage.variable} ${caveat.variable} ${spaceMono.variable}`}>
       <body>
         <a href="#main" className="skip-link">Skip to content</a>
-        <MotionProvider>{children}</MotionProvider>
+        <MotionProvider><FeedbackProvider>{children}</FeedbackProvider></MotionProvider>
         <ServiceWorker />
       </body>
     </html>

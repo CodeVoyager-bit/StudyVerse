@@ -1,6 +1,7 @@
 'use client'
 
 import { useOptimistic, useState, useTransition } from 'react'
+import { useFeedback } from '@/app/components/Feedback'
 import { AnimatePresence, motion } from 'motion/react'
 import { PencilSimpleIcon, TrashIcon, PlusIcon, ClockIcon, FlagIcon, PlayCircleIcon } from '@phosphor-icons/react/dist/ssr'
 import CheckButton from '@/app/components/CheckButton'
@@ -144,8 +145,9 @@ export function useTaskMutations(tasks: Task[]) {
       apply({ id: t.id, patch: { completed: !t.completed } })
       await toggleTask(t.id, !t.completed)
     })
-  const remove = (t: Task) => {
-    if (!confirm(`Delete "${t.title}"? This can't be undone.`)) return
+  const { confirm } = useFeedback()
+  const remove = async (t: Task) => {
+    if (!(await confirm({ title: `Delete "${t.title}"?`, body: 'This can’t be undone.', confirmLabel: 'Delete', danger: true }))) return
     startTransition(async () => {
       apply({ id: t.id, remove: true })
       await deleteTask(t.id)

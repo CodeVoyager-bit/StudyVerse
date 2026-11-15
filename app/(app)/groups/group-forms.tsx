@@ -49,3 +49,8 @@ export function JoinGroupForm({ defaultName, code = '' }: { defaultName: string;
     </form>
   )
 }
+
+/** A date and time in the viewer's own timezone (the server only knows UTC). */
+export function LocalTime({ iso }: { iso: string }) {
+  return <span suppressHydrationWarning>{new Date(iso).toLocaleString(undefined, { weekday: 'short', hour: 'numeric', minute: '2-digit' })}</span>
+}

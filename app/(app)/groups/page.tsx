@@ -1,11 +1,12 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
-import { UsersThreeIcon, CircleIcon } from '@phosphor-icons/react/dist/ssr'
+import { UsersThreeIcon, CircleIcon, ChatCircleDotsIcon, CalendarDotsIcon } from '@phosphor-icons/react/dist/ssr'
 import { createClient } from '@/utils/supabase/server'
 import { firstName } from '@/utils/data'
 import { nowIso } from '@/lib/time'
+import { nextSession } from '@/lib/schedule.mjs'
 import type { StudyGroup, GroupMember } from '@/types/db'
-import { CreateGroupForm, JoinGroupForm } from './group-forms'
+import { CreateGroupForm, JoinGroupForm, LocalTime } from './group-forms'
 
 export const metadata = { title: 'Study groups' }
 
@@ -26,6 +27,14 @@ export default async function GroupsPage() {
   const now = Date.parse(nowIso())
   const name = firstName(user)
 
+  // Unread = other people's messages since you were last in the room.
+  const unread = new Map(await Promise.all(list.map(async (g) => {
+    const seen = all.find((m) => m.group_id === g.id && m.user_id === user.id)?.last_seen
+    let q = supabase.from('group_messages').select('id', { count: 'exact', head: true }).eq('group_id', g.id).neq('user_id', user.id)
+    if (seen) q = q.gt('created_at', seen)
+    return [g.id, (await q).count ?? 0] as const
+  })))
+
   return (
     <div className="page">
       <header className="mb-6">
@@ -38,6 +47,7 @@ export default async function GroupsPage() {
           {list.map((g, i) => {
             const mine = all.filter((m) => m.group_id === g.id)
             const online = mine.filter((m) => m.last_seen && now - Date.parse(m.last_seen) < ONLINE_MS).length
+            const next = nextSession(g.next_session_at, !!g.session_weekly, now)
             return (
               <Link key={g.id} href={`/groups/${g.id}`} className={`card card-link rise flex flex-col gap-3 ${TONES[i % TONES.length]}`} style={{ '--i': i } as React.CSSProperties}>
                 <div className="flex items-start justify-between gap-2">
@@ -48,6 +58,8 @@ export default async function GroupsPage() {
                 <div className="flex flex-wrap gap-1.5 mt-auto">
                   <span className="chip bg-surface">{mine.length} {mine.length === 1 ? 'member' : 'members'}</span>
                   {online > 0 && <span className="chip bg-surface"><CircleIcon size={9} weight="fill" className="text-success" aria-hidden="true" />{online} here now</span>}
+                  {(unread.get(g.id) ?? 0) > 0 && <span className="chip bg-ink text-surface"><ChatCircleDotsIcon size={12} weight="fill" aria-hidden="true" />{unread.get(g.id)! > 99 ? '99+' : unread.get(g.id)} new</span>}
+                  {next && <span className="chip bg-surface"><CalendarDotsIcon size={12} weight="fill" aria-hidden="true" /><LocalTime iso={next} /></span>}
                 </div>
               </Link>
             )

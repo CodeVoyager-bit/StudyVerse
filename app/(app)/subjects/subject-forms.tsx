@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useTransition } from 'react'
+import { useFeedback } from '@/app/components/Feedback'
 import { useRouter } from 'next/navigation'
 import { PlusIcon, TrashIcon, LinkSimpleIcon, CopyIcon, CheckIcon } from '@phosphor-icons/react/dist/ssr'
 import type { Subject } from '@/types/db'
@@ -64,11 +65,13 @@ export function EditSubject({ subject }: { subject: Subject }) {
 export function DeleteSubject({ subject }: { subject: Subject }) {
   const router = useRouter()
   const [pending, startTransition] = useTransition()
-  const remove = () => {
-    if (!confirm(`Delete "${subject.name}"? Its attendance is deleted too. Tasks, notes and library items stay, just without a subject.`)) return
+  const { confirm, toast } = useFeedback()
+  const remove = async () => {
+    if (!(await confirm({ title: `Delete "${subject.name}"?`, body: 'Its attendance goes too. Tasks, notes and library items stay, just without a subject.', confirmLabel: 'Delete subject', danger: true }))) return
     startTransition(async () => {
       const res = await deleteSubject(subject.id)
-      if (res?.error) return alert(res.error)
+      if (res?.error) return toast(res.error, 'error')
+      toast(`Deleted ${subject.name}`)
       router.push('/subjects')
     })
   }
