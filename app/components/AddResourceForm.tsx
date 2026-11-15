@@ -12,7 +12,7 @@ export default function AddResourceForm({ subjects = [], subjectId, groupId, onA
   subjects?: Subject[]
   subjectId?: string
   groupId?: string
-  onAdded?: (id: string) => void
+  onAdded?: (id: string, title: string) => void
 }) {
   const [error, setError] = useState('')
   const form = useRef<HTMLFormElement>(null)
@@ -23,7 +23,7 @@ export default function AddResourceForm({ subjects = [], subjectId, groupId, onA
     if (res?.error) return setError(res.error)
     setError('')
     form.current?.reset()
-    if (res?.id) onAdded?.(res.id)
+    if (res?.id) onAdded?.(res.id, res.title ?? '')
   }
 
   return (

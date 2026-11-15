@@ -10,7 +10,11 @@ import PasswordInput from '@/app/components/PasswordInput'
 import { authMessage } from '@/lib/auth-errors'
 
 // Where to go after login: `?next=/task` (set by proxy.ts) or Today.
-const nextPath = () => new URLSearchParams(window.location.search).get('next') || '/dashboard'
+// Only same-site paths, so a crafted link can't bounce someone to another website after they log in.
+const nextPath = () => {
+  const next = new URLSearchParams(window.location.search).get('next') ?? ''
+  return next.startsWith('/') && !next.startsWith('//') && !next.startsWith('/\\') ? next : '/dashboard'
+}
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')

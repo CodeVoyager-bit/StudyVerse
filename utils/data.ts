@@ -23,3 +23,9 @@ export async function getMyResources(supabase: SupabaseClient, uid: string) {
   const { data } = await supabase.from('resources').select('*').eq('user_id', uid).is('group_id', null).order('created_at', { ascending: false })
   return (data ?? []) as Resource[]
 }
+
+/** A friendly first name for greetings and default display names. */
+export function firstName(user: { email?: string; user_metadata?: Record<string, string | undefined> }) {
+  const m = user.user_metadata ?? {}
+  return m.username || m.full_name?.split(' ')[0] || m.name?.split(' ')[0] || user.email?.split('@')[0] || 'Student'
+}

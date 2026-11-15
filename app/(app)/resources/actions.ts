@@ -5,7 +5,7 @@ import { requireUser } from '@/utils/supabase/server'
 import { parseYouTube } from '@/lib/youtube.mjs'
 import type { ResourceKind } from '@/types/db'
 
-export type Result = { error?: string; id?: string } | undefined
+export type Result = { error?: string; id?: string; title?: string } | undefined
 
 const text = (fd: FormData, key: string) => String(fd.get(key) ?? '').trim()
 
@@ -67,7 +67,7 @@ export async function addResource(fd: FormData): Promise<Result> {
     .single()
   if (error) return { error: error.message }
   refresh(group_id)
-  return { id: data.id }
+  return { id: data.id, title }
 }
 
 export async function setWatched(id: string, watched: boolean): Promise<Result> {

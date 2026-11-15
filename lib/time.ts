@@ -34,3 +34,4 @@ export const daysUntil = (iso: string) => {
   const today = new Date()
   return Math.round((new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime() - new Date(today.getFullYear(), today.getMonth(), today.getDate()).getTime()) / 86_400_000)
 }
+export const nowMs = () => Date.now()

@@ -24,7 +24,7 @@ export async function proxy(request: NextRequest) {
   if (!user) {
     const url = request.nextUrl.clone()
     url.pathname = '/login'
-    url.search = `?next=${encodeURIComponent(request.nextUrl.pathname)}`
+    url.search = `?next=${encodeURIComponent(request.nextUrl.pathname + request.nextUrl.search)}`
     return NextResponse.redirect(url)
   }
   return response
