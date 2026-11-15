@@ -31,5 +31,9 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/dashboard/:path*', '/task/:path*', '/note/:path*', '/pomodoro/:path*', '/planner/:path*', '/gpa/:path*', '/quotes/:path*'],
+  matcher: [
+    '/dashboard/:path*', '/task/:path*', '/note/:path*', '/pomodoro/:path*', '/planner/:path*', '/gpa/:path*', '/quotes/:path*',
+    '/subjects/:path*', '/resources/:path*', '/flashcards/:path*', '/attendance/:path*', '/exams/:path*',
+    '/groups/:path*', '/more/:path*', '/settings/:path*',
+  ],
 }
