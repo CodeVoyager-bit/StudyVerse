@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation'
 import { MagnifyingGlassIcon, XIcon } from '@phosphor-icons/react/dist/ssr'
 import { createClient } from '@/utils/supabase/server'
 import { getSubjects } from '@/utils/data'
+import { aiEnabled } from '@/utils/ai'
 import type { Note } from '@/types/db'
 import NoteList from './note-list'
 
@@ -53,7 +54,7 @@ export default async function NotesPage({ searchParams }: { searchParams: Promis
         </nav>
       )}
 
-      <NoteList key={`${q}|${tag}`} notes={notes} filtered={!!(q || tag)} subjects={subjects} />
+      <NoteList key={`${q}|${tag}`} notes={notes} filtered={!!(q || tag)} subjects={subjects} ai={aiEnabled()} />
     </div>
   )
 }

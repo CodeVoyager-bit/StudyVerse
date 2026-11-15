@@ -4,6 +4,8 @@ import { createClient } from '@/utils/supabase/server'
 import { getSubjects, getMyResources } from '@/utils/data'
 import ResourceCard from '@/app/components/ResourceCard'
 import AddResourceForm from '@/app/components/AddResourceForm'
+import { PasteAiPanel } from '@/app/components/AiTools'
+import { aiEnabled } from '@/utils/ai'
 
 export const metadata = { title: 'Library' }
 
@@ -30,7 +32,10 @@ export default async function LibraryPage({ searchParams }: { searchParams: Prom
         <p className="page-sub">{all.length ? `${all.length} saved, ${unwatched} still to watch or read.` : 'Tutorials, lectures, PDFs and links, sorted by subject.'}</p>
       </header>
 
-      <div className="card mb-6 max-w-[720px]"><AddResourceForm subjects={subjects} /></div>
+      <div className="grid gap-6 mb-6 lg:grid-cols-2 items-start">
+        <div className="card"><AddResourceForm subjects={subjects} /></div>
+        {aiEnabled() && <PasteAiPanel subjects={subjects} />}
+      </div>
 
       {all.length > 0 && (
         <nav className="flex flex-wrap gap-2 mb-6" aria-label="Filter library">

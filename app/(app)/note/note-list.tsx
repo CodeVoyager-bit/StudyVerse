@@ -8,6 +8,7 @@ import { PencilSimpleIcon, TrashIcon, PlusIcon, EyeIcon, PencilLineIcon } from '
 import type { Note, Subject } from '@/types/db'
 import SubmitButton from '@/app/components/SubmitButton'
 import SubjectSelect from '@/app/components/SubjectSelect'
+import { NoteAiTools } from '@/app/components/AiTools'
 import { SPRING } from '@/app/components/motion'
 import { addNote, updateNote, deleteNote, type Result } from './actions'
 
@@ -68,7 +69,7 @@ function NoteForm({ note, action, onDone, subjects }: { note?: Note; action: Act
   )
 }
 
-function NoteCard({ note, onDelete, subjects, tools }: { note: Note; onDelete: () => void; subjects: Subject[]; tools?: React.ReactNode }) {
+function NoteCard({ note, onDelete, subjects, ai }: { note: Note; onDelete: () => void; subjects: Subject[]; ai: boolean }) {
   const [editing, setEditing] = useState(false)
   if (editing) return <div className="card"><NoteForm note={note} action={updateNote.bind(null, note.id)} onDone={() => setEditing(false)} subjects={subjects} /></div>
   const subject = subjects.find((s) => s.id === note.subject_id)
@@ -89,7 +90,7 @@ function NoteCard({ note, onDelete, subjects, tools }: { note: Note; onDelete: (
           {note.tags?.map((t) => <Link key={t} href={`/note?tag=${encodeURIComponent(t)}`} className="chip hover:bg-ink hover:text-surface transition-colors">#{t}</Link>)}
         </div>
       )}
-      {tools}
+      {ai && <NoteAiTools noteId={note.id} subjectId={note.subject_id} />}
       <div className="flex items-center justify-between pt-2 border-t-2 border-dashed border-ink/25">
         <p className="text-xs font-bold" suppressHydrationWarning>{new Date(note.updated_at).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })}</p>
         <div className="flex gap-1 transition-opacity lg:opacity-0 lg:group-hover:opacity-100 lg:group-focus-within:opacity-100">
@@ -101,12 +102,12 @@ function NoteCard({ note, onDelete, subjects, tools }: { note: Note; onDelete: (
   )
 }
 
-export default function NoteList({ notes, filtered, subjects = [], tools }: {
+export default function NoteList({ notes, filtered, subjects = [], ai = false }: {
   notes: Note[]
   filtered: boolean
   subjects?: Subject[]
-  /** Extra controls per note (the AI helpers), rendered on each card. */
-  tools?: (note: Note) => React.ReactNode
+  /** Show the AI summarise / flashcards buttons (only when the server has an API key). */
+  ai?: boolean
 }) {
   const [items, removeOptimistic] = useOptimistic(notes, (state, id: string) => state.filter((n) => n.id !== id))
   const [, startTransition] = useTransition()
@@ -149,7 +150,7 @@ export default function NoteList({ notes, filtered, subjects = [], tools }: {
                 exit={{ opacity: 0, scale: 0.95, transition: { duration: 0.15 } }}
                 transition={SPRING}
               >
-                <NoteCard note={note} onDelete={() => remove(note)} subjects={subjects} tools={tools?.(note)} />
+                <NoteCard note={note} onDelete={() => remove(note)} subjects={subjects} ai={ai} />
               </motion.div>
             ))}
           </AnimatePresence>

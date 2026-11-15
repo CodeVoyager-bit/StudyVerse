@@ -11,6 +11,7 @@
     "test": "node --test"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^1.8.0",
     "@phosphor-icons/react": "^2.1.10",
     "@supabase/ssr": "^0.12.7",
     "@supabase/supabase-js": "^2.49.4",
